@@ -1,0 +1,109 @@
+<div class="page-narrow px-4 py-6 lg:px-8">
+  <div>
+    <h1 class="mb-2 font-display text-2xl font-extrabold tracking-tight text-fg">
+      {{ 'settings.title' | translate }}
+    </h1>
+    <p class="mb-4 text-sm text-muted">{{ 'settings.subtitle' | translate }}</p>
+
+    @if (!canView()) {
+      <div class="banner-muted">{{ 'settings.noPermission' | translate }}</div>
+    } @else {
+      @if (errorMessage(); as error) {
+        <div class="banner-error mb-4" role="alert">
+          {{ error.key | translate: error.params }}
+        </div>
+      }
+
+      @if (loading()) {
+        <p class="text-sm text-muted">{{ 'settings.loading' | translate }}</p>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSaveOvertime()">
+          <fieldset class="card mb-5" [disabled]="!canEdit()">
+            <legend class="field-label mb-3">{{ 'settings.overtimeDeduction' | translate }}</legend>
+
+            <div class="grid gap-x-6 md:grid-cols-2">
+              <div class="mb-5">
+                <label class="field-label mb-1.5 block" for="overtime_unit_hours">
+                  {{ 'settings.overtimeUnit' | translate }}
+                </label>
+                <input id="overtime_unit_hours" type="text" inputmode="decimal" formControlName="overtime_unit_hours" dir="ltr" class="field-input" />
+                @if (fieldError('overtime_unit_hours'); as key) {
+                  <p class="field-error">{{ key | translate }}</p>
+                }
+              </div>
+
+              <div class="mb-5">
+                <label class="field-label mb-1.5 block" for="overtime_rate_per_unit">
+                  {{ 'settings.overtimeRate' | translate }}
+                </label>
+                <input id="overtime_rate_per_unit" type="text" inputmode="decimal" formControlName="overtime_rate_per_unit" dir="ltr" class="field-input" />
+                @if (fieldError('overtime_rate_per_unit'); as key) {
+                  <p class="field-error">{{ key | translate }}</p>
+                }
+              </div>
+
+              <div class="mb-5">
+                <label class="field-label mb-1.5 block" for="deduction_unit_hours">
+                  {{ 'settings.deductionUnit' | translate }}
+                </label>
+                <input id="deduction_unit_hours" type="text" inputmode="decimal" formControlName="deduction_unit_hours" dir="ltr" class="field-input" />
+                @if (fieldError('deduction_unit_hours'); as key) {
+                  <p class="field-error">{{ key | translate }}</p>
+                }
+              </div>
+
+              <div class="mb-5">
+                <label class="field-label mb-1.5 block" for="deduction_rate_per_unit">
+                  {{ 'settings.deductionRate' | translate }}
+                </label>
+                <input id="deduction_rate_per_unit" type="text" inputmode="decimal" formControlName="deduction_rate_per_unit" dir="ltr" class="field-input" />
+                @if (fieldError('deduction_rate_per_unit'); as key) {
+                  <p class="field-error">{{ key | translate }}</p>
+                }
+              </div>
+            </div>
+
+            @if (overtimeSaved()) {
+              <p class="banner-success mb-4">{{ 'settings.saved' | translate }}</p>
+            }
+
+            @if (canEdit()) {
+              <button type="submit" [disabled]="form.invalid || savingOvertime()" class="btn-primary">
+                {{ (savingOvertime() ? 'common.saving' : 'common.save') | translate }}
+              </button>
+            }
+          </fieldset>
+        </form>
+
+        <fieldset class="card" [disabled]="!canEdit()">
+          <legend class="field-label mb-3">{{ 'settings.weeklyHolidays' | translate }}</legend>
+
+          <div class="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            @for (day of weekDays(); track day.day_of_week) {
+              <label class="inline-flex items-center gap-2 text-sm font-semibold text-fg">
+                <input
+                  type="checkbox"
+                  class="size-4 accent-primary-600"
+                  [checked]="day.is_active"
+                  [disabled]="!canEdit()"
+                  (change)="toggleWeeklyDay(day, $any($event.target).checked)"
+                />
+                {{ day.labelKey }}
+              </label>
+            }
+          </div>
+
+          @if (weeklySaved()) {
+            <p class="banner-success mb-4">{{ 'settings.weeklySaved' | translate }}</p>
+          }
+
+          @if (canEdit()) {
+            <button type="button" [disabled]="savingWeekly()" (click)="onSaveWeeklyHolidays()" class="btn-primary">
+              {{ (savingWeekly() ? 'common.saving' : 'common.save') | translate }}
+            </button>
+          }
+        </fieldset>
+      }
+    }
+  </div>
+</div>
