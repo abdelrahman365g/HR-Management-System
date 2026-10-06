@@ -1,0 +1,363 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Ink & Signal — design tokens (docs/hr-design-system.md §4)
+   Semantic light/dark variables live in the `:root` / `.dark`
+   blocks below and are exposed to Tailwind via `@theme inline`,
+   so every `bg-surface`, `text-fg`, `border-line` … utility
+   automatically follows the active theme.
+   ============================================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Fixed brand scale — identical in both themes */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+
+  --color-accent: #8b5cf6;
+  --color-accent-soft: #f5f3ff;
+
+  /* Constant scrim for dialogs/drawers in both themes (flat, no blur) */
+  --color-scrim: rgb(15 23 42 / 0.6);
+
+  /* Overrides Tailwind's default radius scale */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.05), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-md: 0 4px 12px -2px rgb(15 23 42 / 0.08), 0 2px 6px -1px rgb(15 23 42 / 0.04);
+  --shadow-lg: 0 12px 24px -4px rgb(15 23 42 / 0.12), 0 4px 8px -2px rgb(15 23 42 / 0.04);
+  --shadow-sheet: 0 -8px 30px rgb(15 23 42 / 0.15);
+
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-slide-up: slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-scale-in: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in-right: slide-in-right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in-start: slide-in-start 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes slide-up { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes scale-in { from { transform: scale(0.94); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+  /* RTL-safe drawer slide: slides in from the inline-start edge in both directions */
+  @keyframes slide-in-right { from { transform: translateX(100%) } to { transform: translateX(0) } }
+  @keyframes slide-in-start {
+    from { transform: translateX(calc(var(--dir-sign, 1) * 100%)) }
+    to { transform: translateX(0) }
+  }
+}
+
+/* ============================================================
+   Semantic theme variables (swap per theme)
+   ============================================================ */
+:root {
+  /* Light — paper canvas, no near-black surfaces */
+  color-scheme: light;
+
+  --canvas: #f8fafc;
+  --surface: #ffffff;
+  --sunken: #f1f5f9;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  --fg: #0f172a;
+  --muted: #64748b;
+  --subtle: #94a3b8;
+  --fg-inverted: #ffffff;
+
+  /* Sidebar is a light surface with an end-side border in the light theme */
+  --sidebar: #ffffff;
+  --sidebar-line: #e2e8f0;
+  --sidebar-fg: #475569;
+  --sidebar-muted: #64748b;
+  --sidebar-hover: #f1f5f9;
+
+  /* Status pairs: solid + soft background + on-soft text */
+  --success: #059669;
+  --success-soft: #ecfdf5;
+  --success-ink: #065f46;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --warning-ink: #92400e;
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --danger-ink: #991b1b;
+  --secondary: #0284c7;
+  --secondary-soft: #f0f9ff;
+  --secondary-ink: #0369a1;
+
+  /* Hero / brand gradient (dashboard tile, login split side) */
+  --hero-from: #1d4ed8;
+  --hero-to: #8b5cf6;
+
+  /* Links and focus rings */
+  --link: #1d4ed8;
+  --ring: #3b82f6;
+}
+
+.dark {
+  /* Dark — deep slate-navy, never pure black */
+  color-scheme: dark;
+
+  --canvas: #0b1220;
+  --surface: #111a2e;
+  --sunken: #0d1626;
+  --line: #22304a;
+  --line-strong: #2e3d5c;
+  --fg: #e5eaf3;
+  --muted: #94a3b8;
+  --subtle: #64748b;
+  --fg-inverted: #0b1220;
+
+  /* Sidebar is a distinct navy from the canvas */
+  --sidebar: #0d1626;
+  --sidebar-line: #22304a;
+  --sidebar-fg: #cbd5e1;
+  --sidebar-muted: #94a3b8;
+  --sidebar-hover: #1a2540;
+
+  /* Status soft backgrounds become opaque dark tints with light text */
+  --success: #34d399;
+  --success-soft: #0f2a22;
+  --success-ink: #6ee7b7;
+  --warning: #fbbf24;
+  --warning-soft: #2d2410;
+  --warning-ink: #fcd34d;
+  --danger: #f87171;
+  --danger-soft: #2d1215;
+  --danger-ink: #fca5a5;
+  --secondary: #38bdf8;
+  --secondary-soft: #0c1f30;
+  --secondary-ink: #7dd3fc;
+
+  /* Hero / brand gradient stays saturated in the dark theme */
+  --hero-from: #1e40af;
+  --hero-to: #6d28d9;
+
+  /* Links and focus rings use lighter primary shades for contrast */
+  --link: #93c5fd;
+  --ring: #60a5fa;
+}
+
+/* Expose the semantic variables to Tailwind as utilities
+   (bg-surface, text-fg, border-line, …). `inline` keeps the
+   var() references so a `.dark` class flip re-themes instantly. */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-fg-inverted: var(--fg-inverted);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-line: var(--sidebar-line);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-hover: var(--sidebar-hover);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-ink: var(--success-ink);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-ink: var(--warning-ink);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-ink: var(--danger-ink);
+  --color-secondary: var(--secondary);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-secondary-ink: var(--secondary-ink);
+  --color-accent-soft: var(--accent-soft-theme, #f5f3ff);
+
+  --color-scrim: var(--scrim);
+
+  --color-hero-from: var(--hero-from);
+  --color-hero-to: var(--hero-to);
+
+  --color-link: var(--link);
+  --color-ring: var(--ring);
+}
+
+/* Arabic font: Plus Jakarta Sans / Inter have no Arabic glyphs, so swap in
+   IBM Plex Sans Arabic under html[dir="rtl"] with the Latin fonts as fallbacks. */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+  html[dir="rtl"] {
+    --font-display: "IBM Plex Sans Arabic", "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "IBM Plex Sans Arabic", "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+  html[dir="rtl"] body {
+    font-family: var(--font-sans);
+  }
+  body { background-color: var(--canvas); }
+  h1, h2, h3, h4 { font-family: var(--font-display); }
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+/* Signature backgrounds */
+@utility bg-dots {
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+/* Brand gradient used by the dashboard hero tile and the login split side */
+@utility bg-hero {
+  background-image: linear-gradient(135deg, var(--hero-from), var(--hero-to));
+}
+@utility bg-grid-faint {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Shared component classes (keep templates readable) */
+@layer components {
+  .card {
+    @apply rounded-lg border border-line bg-surface p-5 shadow-sm;
+  }
+  .card-interactive {
+    @apply rounded-lg border border-line bg-surface p-5 shadow-sm cursor-pointer transition duration-150
+           hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-md;
+  }
+  .btn {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold transition
+           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold transition
+           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50
+           bg-primary-600 text-white shadow-[0_4px_10px_rgb(37_99_235/0.25)] hover:bg-primary-700;
+  }
+  .btn-secondary {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold transition
+           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50
+           border border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100
+           dark:border-primary-500/30 dark:bg-primary-500/15 dark:text-primary-200 dark:hover:bg-primary-500/25;
+  }
+  .btn-ghost {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold transition
+           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30 active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50
+           border border-line bg-surface text-fg hover:bg-sunken;
+  }
+  .btn-danger {
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold transition
+           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-danger/30 active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50
+           bg-danger text-white shadow-[0_4px_10px_rgb(239_68_68/0.25)] hover:bg-danger/85;
+  }
+  .field-label { @apply text-[13px] font-semibold text-fg; }
+  .field-input {
+    @apply h-12 w-full rounded-md border border-line bg-surface px-3.5 text-sm text-fg outline-none transition
+           placeholder:text-subtle focus:border-primary-600 focus:ring-4 focus:ring-ring/20;
+  }
+  .field-input-error { @apply border-danger bg-danger-soft; }
+  .field-error { @apply mt-1 text-xs font-medium text-danger-ink dark:text-danger; }
+  .chip-present {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold
+           before:size-1.5 before:rounded-full before:bg-current before:content-['']
+           bg-success-soft text-success-ink;
+  }
+  .chip-absent {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold
+           before:size-1.5 before:rounded-full before:bg-current before:content-['']
+           bg-danger-soft text-danger-ink;
+  }
+  .chip-late {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold
+           before:size-1.5 before:rounded-full before:bg-current before:content-['']
+           bg-warning-soft text-warning-ink;
+  }
+  .chip-leave {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold
+           before:size-1.5 before:rounded-full before:bg-current before:content-['']
+           bg-secondary-soft text-secondary-ink;
+  }
+
+  /* Text-button actions inside tables (Edit / Delete etc.) */
+  .btn-text {
+    @apply inline-flex items-center gap-1 text-sm font-semibold text-link hover:underline
+           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/25;
+  }
+  .btn-text-danger {
+    @apply inline-flex items-center gap-1 text-sm font-semibold text-danger hover:underline
+           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-danger/25;
+  }
+
+  /* Error / info / success banners */
+  .banner-error { @apply rounded-md border border-danger/30 bg-danger-soft px-4 py-2.5 text-sm font-medium text-danger-ink dark:text-danger; }
+  .banner-info { @apply rounded-md border border-primary-200 bg-primary-50 px-4 py-2.5 text-sm font-medium text-primary-700 dark:border-primary-500/30 dark:bg-primary-500/15 dark:text-primary-200; }
+  .banner-success { @apply rounded-md border border-success/30 bg-success-soft px-4 py-2.5 text-sm font-medium text-success-ink; }
+  .banner-muted { @apply rounded-md border border-line bg-sunken px-4 py-2.5 text-sm text-muted; }
+
+  /* Data tables */
+  .data-table { @apply w-full border-collapse text-sm; }
+  /* uppercase/letter-spacing has no effect on Arabic and breaks letter
+     joining, so it is reset under html[dir="rtl"] */
+  .data-table thead {
+    @apply bg-sunken text-[11px] font-semibold uppercase tracking-wider text-muted
+           rtl:normal-case rtl:tracking-normal;
+  }
+  .data-table thead th { @apply px-5 py-3.5 text-start font-semibold; }
+  .data-table tbody td { @apply border-t border-line px-5 py-3.5 align-middle; }
+  .data-table tbody tr { @apply hover:bg-canvas; }
+
+  /* Centered page shells (Part 4) */
+  .page { @apply mx-auto w-full max-w-7xl; }
+  .page-narrow { @apply mx-auto w-full max-w-3xl; }
+
+  /* Sidebar nav item; the active state keeps solid primary + white text
+     in both themes. */
+  .nav-item {
+    @apply text-sidebar-fg transition hover:bg-sidebar-hover hover:text-fg
+           focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30;
+  }
+  .nav-item-active {
+    @apply bg-primary-600 text-white shadow-[0_4px_10px_rgb(37_99_235/0.35)] hover:bg-primary-600 hover:text-white;
+  }
+
+  /* Small uppercase eyebrow label — letter-spacing and uppercase are
+     meaningless in Arabic and break joining, hence the rtl: resets. */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-muted rtl:normal-case rtl:tracking-normal;
+  }
+}
+
+/* Native <dialog> scrim: flat overlay (no blur anywhere).
+   Safeguard: layout utilities on a <dialog> must never override its
+   default display:none while closed. */
+dialog::backdrop {
+  background-color: var(--color-scrim);
+}
+dialog:not([open]) { display: none; }
+
+/* Menu flyout shared by the user menu / language menus */
+.menu-panel {
+  @apply rounded-md border border-line bg-surface py-1.5 shadow-lg;
+}
+.menu-item {
+  @apply flex w-full items-center gap-2 px-3 py-2 text-start text-sm font-medium text-fg transition
+         hover:bg-sunken focus-visible:bg-sunken focus-visible:outline-none;
+}
