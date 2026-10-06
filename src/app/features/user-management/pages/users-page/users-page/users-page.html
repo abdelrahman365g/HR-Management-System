@@ -1,0 +1,74 @@
+<div class="page px-4 py-6 lg:px-8">
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
+      {{ 'users.title' | translate }}
+    </h1>
+    @if (canEdit()) {
+      <a routerLink="new" class="btn-primary">{{ 'users.addNew' | translate }}</a>
+    }
+  </div>
+
+  @if (!canView()) {
+    <div class="banner-muted">{{ 'users.noPermission' | translate }}</div>
+  } @else {
+    @if (errorMessage(); as error) {
+      <div class="banner-error mb-4" role="alert">
+        {{ error.key | translate: error.params }}
+      </div>
+    }
+
+    @if (loading()) {
+      <p class="text-sm text-muted">{{ 'users.loading' | translate }}</p>
+    } @else if (users().length === 0) {
+      <p class="text-sm text-muted">{{ 'users.empty' | translate }}</p>
+    } @else {
+      <div class="card overflow-hidden p-0">
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col" class="w-48">{{ 'users.fullNameHeader' | translate }}</th>
+                <th scope="col" class="w-40">{{ 'users.usernameHeader' | translate }}</th>
+                <th scope="col">{{ 'users.emailHeader' | translate }}</th>
+                <th scope="col" class="w-40">{{ 'users.groupHeader' | translate }}</th>
+                <th scope="col" class="w-24">{{ 'users.statusHeader' | translate }}</th>
+                @if (canEdit()) {
+                  <th scope="col" class="w-32">{{ 'common.actions' | translate }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users(); track user.id) {
+                <tr>
+                  <td class="font-semibold text-fg">{{ user.full_name }}</td>
+                  <td class="text-muted"><span dir="ltr">{{ user.username }}</span></td>
+                  <td class="text-muted"><span dir="ltr">{{ user.email }}</span></td>
+                  <td>
+                    <span class="chip-leave">{{ groupName(user) }}</span>
+                  </td>
+                  <td>
+                    <span [class]="user.is_active ? 'chip-present' : 'chip-absent'">
+                      {{ (user.is_active ? 'users.active' : 'users.inactive') | translate }}
+                    </span>
+                  </td>
+                  @if (canEdit()) {
+                    @if (!user.is_hr_admin) {
+                      <td class="whitespace-nowrap">
+                        <a [routerLink]="[user.id]" class="btn-text me-3">{{ 'common.edit' | translate }}</a>
+                        <button type="button" (click)="onDelete(user)" class="btn-text-danger">
+                          {{ 'common.delete' | translate }}
+                        </button>
+                      </td>
+                    } @else {
+                      <td class="text-xs text-muted">—</td>
+                    }
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>
