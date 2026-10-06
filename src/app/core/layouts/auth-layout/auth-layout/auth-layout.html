@@ -1,0 +1,237 @@
+<div class="relative min-h-screen bg-canvas">
+  <!-- Compact language + theme switchers, top inline-end corner -->
+  <div class="absolute end-4 top-4 z-20 flex items-center gap-2">
+    <!-- Theme toggle -->
+    <div class="relative">
+      <button
+        type="button"
+        class="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-surface px-3 text-sm font-semibold text-fg shadow-sm transition hover:bg-sunken focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30"
+        (click)="toggleThemeMenu()"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="themeMenuOpen()"
+        [attr.aria-label]="'userMenu.theme' | translate"
+      >
+        <!-- Sun for light, moon for dark/system-resolved-dark -->
+        @if (themeService.isDark()) {
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted"
+            aria-hidden="true"
+          >
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+          </svg>
+        } @else {
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+          </svg>
+        }
+      </button>
+
+      @if (themeMenuOpen()) {
+        <div
+          role="menu"
+          class="menu-panel absolute end-0 top-full mt-2 w-40 animate-scale-in"
+          (keydown.escape)="closeMenu()"
+        >
+          @for (option of themeOptions; track option.value) {
+            <button
+              type="button"
+              role="menuitemradio"
+              [attr.aria-checked]="themeService.preference() === option.value"
+              class="menu-item"
+              (click)="chooseTheme(option.value)"
+            >
+              <span class="flex-1">{{ option.labelKey | translate }}</span>
+              @if (themeService.preference() === option.value) {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-primary-600"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Language switcher -->
+    <div class="relative">
+      <button
+        type="button"
+        class="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-surface px-3 text-sm font-semibold text-fg shadow-sm transition hover:bg-sunken focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30"
+        (click)="toggleMenu()"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="menuOpen()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-muted"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+          <path d="M2 12h20" />
+        </svg>
+        {{ languageService.current() === 'ar' ? 'العربية' : 'English' }}
+      </button>
+
+      @if (menuOpen()) {
+        <div
+          role="menu"
+          class="menu-panel absolute end-0 top-full mt-2 w-40 animate-scale-in"
+          (keydown.escape)="closeMenu()"
+        >
+          @for (language of languages; track language.code) {
+            <button
+              type="button"
+              role="menuitemradio"
+              [attr.aria-checked]="isCurrent(language)"
+              class="menu-item"
+              (click)="chooseLanguage(language)"
+            >
+              <span class="flex-1">{{ language.label }}</span>
+              @if (isCurrent(language)) {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-primary-600"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Split layout at lg: brand-gradient side + form side -->
+  <div class="grid min-h-screen lg:grid-cols-2">
+    <!-- Brand side (lg+): primary-700 → accent gradient, never near-black -->
+    <div class="hidden flex-col justify-between bg-hero bg-grid-faint p-12 lg:flex">
+      <div class="flex items-center gap-3">
+        <span
+          class="grid size-10 place-items-center rounded-md bg-gradient-to-br from-primary-600 to-accent text-white"
+          aria-hidden="true"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+            <path d="M6 12h12" />
+            <path d="M10 6h2" />
+            <path d="M10 9h2" />
+            <path d="M10 15h2" />
+            <path d="M10 18h2" />
+          </svg>
+        </span>
+        <span class="font-display text-lg font-extrabold text-fg-inverted">HRMS</span>
+      </div>
+
+      <div>
+        <h1 class="font-display text-3xl font-extrabold tracking-tight text-fg-inverted">
+          {{ 'auth.brandTagline' | translate }}
+        </h1>
+        <ul class="mt-8 space-y-4 text-sm text-primary-100">
+          <li class="flex items-center gap-3">
+            <span class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-sky-300" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" /></svg>
+            </span>
+            {{ 'auth.featureAttendance' | translate }}
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-accent" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+            </span>
+            {{ 'auth.featureEmployees' | translate }}
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-success" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+            </span>
+            {{ 'auth.featurePayroll' | translate }}
+          </li>
+        </ul>
+      </div>
+
+      <p class="text-xs text-primary-100">{{ 'auth.brandFooter' | translate }}</p>
+    </div>
+
+    <!-- Form side -->
+    <div class="flex items-center justify-center px-4 py-16">
+      <div class="w-full max-w-md">
+        <!-- Logo above the form below lg -->
+        <div class="mb-8 flex items-center justify-center gap-3 lg:hidden">
+          <span
+            class="grid size-10 place-items-center rounded-md bg-gradient-to-br from-primary-600 to-accent text-white"
+            aria-hidden="true"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+              <path d="M6 12h12" />
+            </svg>
+          </span>
+          <span class="font-display text-lg font-extrabold text-fg">HRMS</span>
+        </div>
+        <router-outlet />
+      </div>
+    </div>
+  </div>
+</div>
