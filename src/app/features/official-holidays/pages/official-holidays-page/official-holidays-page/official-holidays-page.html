@@ -1,0 +1,106 @@
+<div class="page-narrow px-4 py-6 lg:px-8">
+  <div>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
+        {{ 'holidays.title' | translate }}
+      </h1>
+      <label class="flex items-center gap-2 text-sm font-semibold text-fg">
+        {{ 'holidays.year' | translate }}
+        <select
+          [value]="selectedYear()"
+          (change)="onYearChanged($any($event.target).value)"
+          class="field-input h-10 w-auto"
+        >
+          @for (year of years(); track year) {
+            <option [value]="year">{{ year }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    @if (!canView()) {
+      <div class="banner-muted">{{ 'holidays.noPermission' | translate }}</div>
+    } @else {
+      @if (errorMessage(); as error) {
+        <div class="banner-error mb-4" role="alert">
+          {{ error.key | translate: error.params }}
+        </div>
+      }
+
+      @if (canEdit()) {
+        <form [formGroup]="form" (ngSubmit)="onCreate()" class="card mb-6">
+          <div class="flex flex-wrap items-start gap-4">
+            <div>
+              <label class="field-label mb-1.5 block" for="name">{{ 'holidays.name' | translate }}</label>
+              <input
+                id="name"
+                type="text"
+                formControlName="name"
+                [attr.placeholder]="'holidays.namePlaceholder' | translate"
+                class="field-input w-full"
+              />
+              @if (fieldError('name'); as key) {
+                <p class="field-error">{{ key | translate }}</p>
+              }
+            </div>
+            <div>
+              <label class="field-label mb-1.5 block" for="holiday_date">
+                {{ 'holidays.date' | translate }}
+              </label>
+              <input id="holiday_date" type="date" formControlName="holiday_date" class="field-input w-auto" />
+              @if (fieldError('holiday_date'); as key) {
+                <p class="field-error">{{ key | translate }}</p>
+              }
+            </div>
+            <button
+              type="submit"
+              [disabled]="form.invalid || saving()"
+              class="btn-primary mt-6"
+            >
+              {{ (saving() ? 'common.adding' : 'common.add') | translate }}
+            </button>
+          </div>
+        </form>
+      }
+
+      @if (loading()) {
+        <p class="text-sm text-muted">{{ 'holidays.loading' | translate }}</p>
+      } @else if (holidays().length === 0) {
+        <p class="text-sm text-muted">{{ 'holidays.empty' | translate: { year: selectedYear() } }}</p>
+      } @else {
+        <div class="card overflow-hidden p-0">
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">{{ 'holidays.nameHeader' | translate }}</th>
+                  <th scope="col" class="w-40">{{ 'holidays.dateHeader' | translate }}</th>
+                  <th scope="col" class="w-40">{{ 'holidays.weekdayHeader' | translate }}</th>
+                  @if (canEdit()) {
+                    <th scope="col" class="w-24">{{ 'common.actions' | translate }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (holiday of holidays(); track holiday.id) {
+                  <tr>
+                    <td class="font-semibold text-fg">{{ holiday.name }}</td>
+                    <td class="text-muted">{{ dateLabel(holiday) }}</td>
+                    <td class="text-muted">{{ weekdayLabel(holiday) }}</td>
+                    @if (canEdit()) {
+                      <td class="whitespace-nowrap">
+                        <button type="button" (click)="onDelete(holiday)" class="btn-text-danger">
+                          {{ 'common.delete' | translate }}
+                        </button>
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

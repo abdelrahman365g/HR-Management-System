@@ -1,0 +1,3 @@
+/* The confirm dialog renders on the native <dialog> element; the flat
+   ink scrim is applied via the global dialog::backdrop rule (no blur).
+   Nothing else is needed here — layout lives in Tailwind utilities. */

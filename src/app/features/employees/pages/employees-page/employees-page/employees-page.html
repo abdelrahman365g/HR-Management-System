@@ -1,0 +1,154 @@
+<div class="page px-4 py-6 lg:px-8">
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
+      {{ 'employees.title' | translate }}
+    </h1>
+    @if (canEdit()) {
+      <a routerLink="new" class="btn-primary">{{ 'employees.addNew' | translate }}</a>
+    }
+  </div>
+
+  @if (!canView()) {
+    <div class="banner-muted">{{ 'employees.noPermission' | translate }}</div>
+  } @else {
+    @if (errorMessage(); as error) {
+      <div class="banner-error mb-4" role="alert">
+        {{ error.key | translate: error.params }}
+      </div>
+    }
+
+    <div class="mb-4 flex flex-wrap items-center gap-3">
+      <input
+        #searchBox
+        type="search"
+        [attr.placeholder]="'employees.searchPlaceholder' | translate"
+        [value]="searchTerm()"
+        (keyup.enter)="onSearch(searchBox.value)"
+        class="field-input h-11 w-72"
+      />
+      <button type="button" (click)="onSearch(searchBox.value)" class="btn-ghost h-11">
+        {{ 'common.search' | translate }}
+      </button>
+      <select
+        #deptFilter
+        [value]="departmentFilter()"
+        (change)="onDepartmentFilterChanged(deptFilter.value)"
+        class="field-input h-11 w-auto"
+      >
+        <option value="">{{ 'employees.allDepartments' | translate }}</option>
+        @for (department of departments(); track department.id) {
+          <option [value]="department.id">{{ department.name }}</option>
+        }
+      </select>
+    </div>
+
+    @if (loading()) {
+      <p class="text-sm text-muted">{{ 'employees.loading' | translate }}</p>
+    } @else if (employees().length === 0) {
+      <p class="text-sm text-muted">{{ 'employees.empty' | translate }}</p>
+    } @else {
+      <div class="card overflow-hidden p-0">
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">{{ 'employees.fullNameHeader' | translate }}</th>
+                <th scope="col" class="w-44">{{ 'employees.departmentHeader' | translate }}</th>
+                <th scope="col" class="w-36">{{ 'employees.phoneHeader' | translate }}</th>
+                <th scope="col" class="w-40">{{ 'employees.nationalIdHeader' | translate }}</th>
+                <th scope="col" class="w-36">{{ 'employees.contractDateHeader' | translate }}</th>
+                <th scope="col" class="w-36">{{ 'employees.baseSalaryHeader' | translate }}</th>
+                @if (canEdit()) {
+                  <th scope="col" class="w-32">{{ 'common.actions' | translate }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (employee of employees(); track employee.id) {
+                <tr>
+                  <td class="font-semibold text-fg">{{ employee.full_name }}</td>
+                  <td class="text-muted">{{ departmentName(employee) }}</td>
+                  <td class="text-muted">
+                    <span dir="ltr">{{ employee.phone_number }}</span>
+                  </td>
+                  <td class="text-muted">
+                    <span dir="ltr">{{ employee.national_id }}</span>
+                  </td>
+                  <td class="text-muted">{{ contractDate(employee) }}</td>
+                  <td class="text-muted tabular-nums">
+                    <span dir="ltr">{{ salary(employee) }}</span>
+                  </td>
+                  @if (canEdit()) {
+                    <td class="whitespace-nowrap">
+                      <a [routerLink]="[employee.id, 'edit']" class="btn-text me-3">
+                        {{ 'common.edit' | translate }}
+                      </a>
+                      <button type="button" (click)="onDelete(employee)" class="btn-text-danger">
+                        {{ 'common.delete' | translate }}
+                      </button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center gap-3 text-sm text-muted">
+        <button
+          type="button"
+          [disabled]="!hasPrev()"
+          (click)="goToPage(page() - 1)"
+          class="btn-ghost h-9 px-3"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="rtl:-scale-x-100"
+            aria-hidden="true"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          {{ 'common.previous' | translate }}
+        </button>
+        <span>
+          {{
+            'common.pageOf'
+              | translate: { page: page() + 1, totalPages: totalPages(), total: total() }
+          }}
+        </span>
+        <button
+          type="button"
+          [disabled]="!hasNext()"
+          (click)="goToPage(page() + 1)"
+          class="btn-ghost h-9 px-3"
+        >
+          {{ 'common.next' | translate }}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="rtl:-scale-x-100"
+            aria-hidden="true"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+      </div>
+    }
+  }
+</div>

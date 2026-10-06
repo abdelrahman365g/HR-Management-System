@@ -1,0 +1,346 @@
+<div class="relative" (keydown.escape)="close()">
+  <button
+    type="button"
+    class="flex w-full items-center gap-3 rounded-md p-2 text-start transition hover:bg-sidebar-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30"
+    (click)="toggle()"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="open() ? menuElementId : null"
+  >
+    <span
+      class="grid size-9 shrink-0 place-items-center rounded-full bg-primary-600 text-sm font-bold text-white"
+      aria-hidden="true"
+    >
+      {{ initials() }}
+    </span>
+    <span class="min-w-0 flex-1">
+      <span class="block truncate text-sm font-semibold text-fg">
+        {{ auth.currentUser()?.full_name }}
+      </span>
+      <span class="block truncate text-xs text-sidebar-muted">
+        {{ groupName() }}
+      </span>
+    </span>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="shrink-0 text-sidebar-muted transition-transform"
+      [class.rotate-180]="open()"
+      aria-hidden="true"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  </button>
+
+  @if (open()) {
+    <div
+      [attr.id]="menuElementId"
+      role="menu"
+      class="absolute bottom-full mb-2 w-full min-w-52 rounded-md border border-line bg-surface py-1.5 shadow-lg animate-scale-in"
+    >
+      <div class="relative">
+        <button
+          type="button"
+          role="menuitem"
+          aria-haspopup="true"
+          [attr.aria-expanded]="languagesOpen()"
+          class="flex w-full items-center gap-2 px-3 py-2 text-start text-sm font-medium text-fg transition hover:bg-sunken focus-visible:bg-sunken focus-visible:outline-none"
+          (click)="toggleLanguages()"
+          (keydown.arrowright)="onLanguagesArrow($event, 'right')"
+          (keydown.arrowleft)="onLanguagesArrow($event, 'left')"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+            <path d="M2 12h20" />
+          </svg>
+          <span class="flex-1">{{ 'userMenu.language' | translate }}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted transition-transform rtl:-scale-x-100"
+            [class.rotate-180]="languagesOpen()"
+            aria-hidden="true"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+
+        @if (languagesOpen()) {
+          @if (isMobile()) {
+            <div role="menu" class="mb-1 ms-6 border-s border-line ps-2">
+              @for (language of languages; track language.code) {
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  [attr.aria-checked]="isCurrentLanguage(language)"
+                  class="menu-item"
+                  (click)="chooseLanguage(language)"
+                >
+                  <span class="flex-1">{{ language.label }}</span>
+                  @if (isCurrentLanguage(language)) {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-primary-600"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  }
+                </button>
+              }
+            </div>
+          } @else {
+            <div
+              role="menu"
+              class="menu-panel absolute top-0 inset-e-0 me-2 w-40 animate-scale-in"
+              [class.translate-x-full]="dir() === 'ltr'"
+              [class.-right-2]="dir() === 'ltr'"
+              [class.right-full]="dir() === 'rtl'"
+            >
+              @for (language of languages; track language.code) {
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  [attr.aria-checked]="isCurrentLanguage(language)"
+                  class="menu-item"
+                  (click)="chooseLanguage(language)"
+                >
+                  <span class="flex-1">{{ language.label }}</span>
+                  @if (isCurrentLanguage(language)) {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-primary-600"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  }
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <div class="relative">
+        <button
+          type="button"
+          role="menuitem"
+          aria-haspopup="true"
+          [attr.aria-expanded]="themeOpen()"
+          class="flex w-full items-center gap-2 px-3 py-2 text-start text-sm font-medium text-fg transition hover:bg-sunken focus-visible:bg-sunken focus-visible:outline-none"
+          (click)="toggleTheme()"
+          (keydown.arrowright)="onThemeArrow($event, 'right')"
+          (keydown.arrowleft)="onThemeArrow($event, 'left')"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 8a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1M12 3v2M12 19v2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M3 12h2M19 12h2M6.3 17.7l1.4-1.4M18.4 5.6 17 7"
+            />
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+          <span class="flex-1">{{ 'userMenu.theme' | translate }}</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted transition-transform rtl:-scale-x-100"
+            [class.rotate-180]="themeOpen()"
+            aria-hidden="true"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </button>
+
+        @if (themeOpen()) {
+          @if (isMobile()) {
+            <div role="menu" class="mb-1 ms-6 border-s border-line ps-2">
+              @for (option of themeOptions; track option.value) {
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  [attr.aria-checked]="themeService.preference() === option.value"
+                  class="menu-item"
+                  (click)="chooseTheme(option.value)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-muted"
+                    aria-hidden="true"
+                  >
+                    <path [attr.d]="option.icon" />
+                  </svg>
+                  <span class="flex-1">{{ option.labelKey | translate }}</span>
+                  @if (themeService.preference() === option.value) {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-primary-600"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  }
+                </button>
+              }
+            </div>
+          } @else {
+            <div
+              role="menu"
+              class="menu-panel absolute top-0 inset-e-0 me-2 w-40 animate-scale-in"
+              [class.translate-x-full]="dir() === 'ltr'"
+              [class.-right-2]="dir() === 'ltr'"
+              [class.right-full]="dir() === 'rtl'"
+            >
+              @for (option of themeOptions; track option.value) {
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  [attr.aria-checked]="themeService.preference() === option.value"
+                  class="menu-item"
+                  (click)="chooseTheme(option.value)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-muted"
+                    aria-hidden="true"
+                  >
+                    <path [attr.d]="option.icon" />
+                  </svg>
+                  <span class="flex-1">{{ option.labelKey | translate }}</span>
+                  @if (themeService.preference() === option.value) {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-primary-600"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  }
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <div class="my-1.5 border-t border-line" role="separator"></div>
+      <button
+        type="button"
+        role="menuitem"
+        class="flex w-full items-center gap-2 px-3 py-2 text-start text-sm font-medium text-danger transition hover:bg-danger-soft focus-visible:bg-danger-soft focus-visible:outline-none"
+        (click)="logout()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" x2="9" y1="12" y2="12" />
+        </svg>
+        <span>{{ 'userMenu.logout' | translate }}</span>
+      </button>
+    </div>
+  }
+</div>

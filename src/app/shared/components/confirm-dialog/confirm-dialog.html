@@ -1,0 +1,81 @@
+<dialog
+  #dialog
+  class="m-auto w-[calc(100%-2rem)] max-w-sm rounded-xl bg-surface p-6 shadow-lg animate-scale-in"
+  aria-labelledby="confirm-title"
+  aria-describedby="confirm-message"
+>
+  @if (confirmService.state(); as state) {
+    <div class="flex items-start gap-4">
+      <div
+        class="grid size-10 shrink-0 place-items-center rounded-full"
+        [class.bg-danger-soft]="state.variant === 'danger'"
+        [class.text-danger]="state.variant === 'danger'"
+        [class.bg-primary-100]="state.variant === 'info'"
+        [class.text-primary-700]="state.variant === 'info'"
+        aria-hidden="true"
+      >
+        @if (state.variant === 'danger') {
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+            <path d="M12 9v4" />
+            <path d="M12 17h.01" />
+          </svg>
+        } @else {
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4" />
+            <path d="M12 8h.01" />
+          </svg>
+        }
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <h2 id="confirm-title" class="font-display text-base font-bold text-fg">
+          {{ state.titleKey | translate: state.params }}
+        </h2>
+        @if (state.messageKey) {
+          <p id="confirm-message" class="mt-1.5 text-sm text-muted">
+            {{ state.messageKey | translate: state.params }}
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- Order follows the document direction; no reversal in RTL. -->
+    <div class="mt-6 flex flex-row justify-end gap-3">
+      <button #cancelBtn type="button" class="btn btn-ghost min-w-24" (click)="onCancel()">
+        {{ state.cancelKey | translate }}
+      </button>
+      <button
+        #confirmBtn
+        type="button"
+        class="btn min-w-24"
+        [class.btn-danger]="state.variant === 'danger'"
+        [class.btn-primary]="state.variant === 'info'"
+        (click)="onConfirm()"
+      >
+        {{ state.confirmKey | translate }}
+      </button>
+    </div>
+  }
+</dialog>

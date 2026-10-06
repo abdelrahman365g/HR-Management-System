@@ -1,0 +1,435 @@
+<div class="page px-4 py-6 lg:px-8">
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
+      {{ 'salary.title' | translate }}
+    </h1>
+    @if (isMonthly() && canSaveSnapshot()) {
+      <button
+        type="button"
+        (click)="onSaveSnapshot()"
+        [disabled]="savingSnapshot()"
+        class="btn-primary"
+      >
+        {{ (savingSnapshot() ? 'common.saving' : 'salary.saveSnapshot') | translate }}
+      </button>
+    }
+  </div>
+
+  @if (!canView()) {
+    <div class="banner-muted">{{ 'salary.noPermission' | translate }}</div>
+  } @else {
+    @if (errorMessage(); as error) {
+      <div class="banner-error mb-4" role="alert">
+        {{ error.key | translate: error.params }}
+      </div>
+    }
+    @if (infoMessage(); as info) {
+      <div class="banner-success mb-4">
+        {{ info.key | translate: info.params }}
+      </div>
+    }
+
+    <div class="mb-4 inline-flex overflow-hidden rounded-md border border-line">
+      <button
+        type="button"
+        (click)="setMode('monthly')"
+        class="px-4 py-2 text-sm font-semibold transition"
+        [class.bg-primary-600]="isMonthly()"
+        [class.text-white]="isMonthly()"
+        [class.bg-surface]="!isMonthly()"
+        [class.hover:bg-sunken]="!isMonthly()"
+      >
+        {{ 'salary.reportTypeMonthly' | translate }}
+      </button>
+      <button
+        type="button"
+        (click)="setMode('yearly')"
+        class="px-4 py-2 text-sm font-semibold transition"
+        [class.bg-primary-600]="!isMonthly()"
+        [class.text-white]="!isMonthly()"
+        [class.bg-surface]="isMonthly()"
+        [class.hover:bg-sunken]="isMonthly()"
+      >
+        {{ 'salary.reportTypeYearly' | translate }}
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSearch()" class="card mb-5">
+      <div class="flex flex-wrap items-start gap-4">
+        <div>
+          <label class="field-label mb-1.5 block" for="employeeName">
+            {{ 'salary.employeeName' | translate }}
+            @if (!isMonthly()) {
+              <span class="text-danger">*</span>
+            }
+          </label>
+          <input
+            id="employeeName"
+            type="text"
+            formControlName="employeeName"
+            class="field-input w-56"
+          />
+        </div>
+        @if (isMonthly()) {
+          <div>
+            <label class="field-label mb-1.5 block" for="department_id">{{
+              'salary.department' | translate
+            }}</label>
+            <select id="department_id" formControlName="department_id" class="field-input w-auto">
+              <option value="">{{ 'salary.filtersAll' | translate }}</option>
+              @for (department of departments(); track department.id) {
+                <option [value]="department.id">{{ department.name }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="field-label mb-1.5 block" for="month">{{
+              'salary.month' | translate
+            }}</label>
+            <select id="month" formControlName="month" class="field-input w-auto">
+              @for (m of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track m) {
+                <option [value]="m">{{ monthLabel(m) }}</option>
+              }
+            </select>
+          </div>
+        }
+        <div>
+          <label class="field-label mb-1.5 block" for="year">{{ 'salary.year' | translate }}</label>
+          <select id="year" formControlName="year" class="field-input w-auto">
+            @for (y of yearOptions(); track y) {
+              <option [value]="y">{{ y }}</option>
+            }
+          </select>
+        </div>
+        <button type="submit" class="btn-primary mt-6">{{ 'common.show' | translate }}</button>
+      </div>
+      @if (isMonthly() && isCurrentPeriod() && canSaveSnapshot()) {
+        <p class="mt-3 text-xs text-muted">{{ 'salary.snapshotCurrentNote' | translate }}</p>
+      }
+    </form>
+
+    @if (loading()) {
+      <p class="text-sm text-muted">{{ 'salary.loading' | translate }}</p>
+    } @else if (isMonthly()) {
+      @if (!searched()) {
+        <p class="text-sm text-muted">{{ 'salary.initialHint' | translate }}</p>
+      } @else {
+        @if (rows().length === 0) {
+          <p class="text-sm text-muted">{{ 'salary.emptyReport' | translate }}</p>
+        } @else {
+          <div class="mb-3">
+            <button
+              type="button"
+              (click)="onPrintMonthlyReport()"
+              [disabled]="printing()"
+              class="btn-secondary"
+            >
+              {{ (printing() ? 'salary.preparing' : 'salary.printReport') | translate }}
+            </button>
+          </div>
+
+          <div class="card overflow-hidden p-0">
+            <div class="overflow-x-auto">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{{ 'salary.employeeHeader' | translate }}</th>
+                    <th scope="col">{{ 'salary.department' | translate }}</th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.baseSalaryHeader' | translate: { currency: currencyCode } }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.attendanceDaysHeader' | translate }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.absenceDaysHeader' | translate }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.notEmployedColumn' | translate }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.overtimeHoursHeader' | translate }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.lateEarlyHoursHeader' | translate }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.totalOvertimeHeader' | translate: { currency: currencyCode } }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{
+                        'salary.lateEarlyDeductionHeader' | translate: { currency: currencyCode }
+                      }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.absenceDeductionHeader' | translate: { currency: currencyCode } }}
+                    </th>
+                    <th scope="col" class="text-end">
+                      {{ 'salary.netSalaryHeader' | translate: { currency: currencyCode } }}
+                    </th>
+                    <th scope="col">{{ 'salary.sourceHeader' | translate }}</th>
+                    <th scope="col">{{ 'common.actions' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of rows(); track row.employee_id) {
+                    <tr>
+                      <td class="font-semibold text-fg">{{ row.employee_name }}</td>
+                      <td class="text-muted">{{ row.department_name }}</td>
+                      <td class="text-end text-muted tabular-nums">
+                        <span dir="ltr">{{ money(row.base_salary) }}</span>
+                      </td>
+                      <td class="text-end text-muted tabular-nums">{{ row.attendance_days }}</td>
+                      <td class="text-end text-muted tabular-nums">{{ row.absence_days }}</td>
+                      <td class="text-end text-muted tabular-nums">{{ row.not_employed_days }}</td>
+                      <td class="text-end text-muted tabular-nums">
+                        <span dir="ltr">{{ hours(row.overtime_hours) }}</span>
+                      </td>
+                      <td class="text-end text-muted tabular-nums">
+                        <span dir="ltr">{{ hours(row.deduction_hours) }}</span>
+                      </td>
+                      <td class="text-end text-muted tabular-nums">
+                        <span dir="ltr">{{ money(row.total_overtime_amount) }}</span>
+                      </td>
+                      <td class="text-end text-muted tabular-nums">
+                        <span dir="ltr">{{ money(row.total_deduction_amount) }}</span>
+                      </td>
+                      <td class="text-end text-muted tabular-nums">
+                        <span dir="ltr">{{ money(row.total_absence_amount) }}</span>
+                      </td>
+                      <td class="text-end font-semibold text-fg tabular-nums">
+                        <span dir="ltr">{{ money(row.net_salary) }}</span>
+                      </td>
+                      <td>
+                        <span [class]="isSourceSaved(row.source) ? 'chip-present' : 'chip-late'">
+                          {{ sourceLabelKey(row.source) | translate }}
+                        </span>
+                      </td>
+                      <td class="whitespace-nowrap">
+                        <button type="button" (click)="onPrint(row)" class="btn-text">
+                          {{ 'common.print' | translate }}
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="mt-4 flex items-center gap-3 text-sm text-muted">
+            <button
+              type="button"
+              [disabled]="!hasPrev()"
+              (click)="goToPage(page() - 1)"
+              class="btn-ghost h-9 px-3"
+            >
+              {{ 'common.previous' | translate }}
+            </button>
+            <span>{{
+              'common.pageOf'
+                | translate: { page: page() + 1, totalPages: totalPages(), total: total() }
+            }}</span>
+            <button
+              type="button"
+              [disabled]="!hasNext()"
+              (click)="goToPage(page() + 1)"
+              class="btn-ghost h-9 px-3"
+            >
+              {{ 'common.next' | translate }}
+            </button>
+          </div>
+
+          <p class="mt-4 text-xs text-muted">{{ 'salary.tableNote' | translate }}</p>
+        }
+      }
+    } @else {
+      @if (!searched()) {
+        <p class="text-sm text-muted">{{ 'salary.yearlyInitialHint' | translate }}</p>
+      } @else if (!yearlyReport()) {
+        <p class="text-sm text-muted">{{ 'salary.emptyReport' | translate }}</p>
+      } @else {
+        @if (yearlyReport(); as report) {
+          @if (report.months.length === 0) {
+            <p class="text-sm text-muted">{{ 'salary.yearlyEmpty' | translate }}</p>
+          } @else {
+            <div class="mb-3 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                (click)="onPrintYearlyReport()"
+                [disabled]="printing()"
+                class="btn-secondary"
+              >
+                {{ (printing() ? 'salary.preparing' : 'salary.printYearlyReport') | translate }}
+              </button>
+              @if (report.totals.includes_current_month) {
+                <span class="text-sm font-medium text-warning-ink">{{
+                  'salary.yearlyLiveNotice' | translate
+                }}</span>
+              }
+              @if (report.totals.snapshot_months < report.totals.months_count) {
+                <span class="text-sm text-muted">
+                  {{
+                    snapshotCoverageLabel(report.totals.snapshot_months, report.totals.months_count)
+                  }}
+                </span>
+              }
+            </div>
+
+            <div class="card mb-4">
+              <p class="field-label mb-2">{{ 'salary.summaryTitle' | translate }}</p>
+              <div class="grid grid-cols-2 gap-x-8 gap-y-1 text-sm md:grid-cols-2 lg:grid-cols-4">
+                <span class="text-muted">{{ 'salary.totalNetSalary' | translate }}</span>
+                <span class="font-semibold text-fg tabular-nums"
+                  ><span dir="ltr">{{ money(report.totals.total_net_salary) }}</span>
+                  {{ currencyCode }}</span
+                >
+                <span class="text-muted">{{ 'salary.totalOvertime' | translate }}</span>
+                <span class="text-fg tabular-nums"
+                  ><span dir="ltr">{{ money(report.totals.total_overtime_amount) }}</span>
+                  {{ currencyCode }}</span
+                >
+                <span class="text-muted">{{ 'salary.totalDeduction' | translate }}</span>
+                <span class="text-fg tabular-nums"
+                  ><span dir="ltr">{{ money(report.totals.total_deduction_amount) }}</span>
+                  {{ currencyCode }}</span
+                >
+                <span class="text-muted">{{ 'salary.totalAbsence' | translate }}</span>
+                <span class="text-fg tabular-nums"
+                  ><span dir="ltr">{{ money(report.totals.total_absence_amount) }}</span>
+                  {{ currencyCode }}</span
+                >
+                <span class="text-muted">{{ 'salary.totalAttendance' | translate }}</span>
+                <span class="text-fg tabular-nums">{{ report.totals.attendance_days }}</span>
+                <span class="text-muted">{{ 'salary.totalAbsenceDays' | translate }}</span>
+                <span class="text-fg tabular-nums">{{ report.totals.absence_days }}</span>
+              </div>
+            </div>
+
+            <div class="card overflow-hidden p-0">
+              <div class="overflow-x-auto">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{{ 'salary.month' | translate }}</th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.attendanceDaysHeader' | translate }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.absenceDaysHeader' | translate }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.notEmployedColumn' | translate }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.overtimeHoursHeader' | translate }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.deductionHoursHeader' | translate }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.baseSalaryHeader' | translate: { currency: currencyCode } }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.totalOvertimeHeader' | translate: { currency: currencyCode } }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{
+                          'salary.lateEarlyDeductionHeader' | translate: { currency: currencyCode }
+                        }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{
+                          'salary.absenceDeductionHeader' | translate: { currency: currencyCode }
+                        }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.netSalaryHeader' | translate: { currency: currencyCode } }}
+                      </th>
+                      <th scope="col">{{ 'salary.sourceHeader' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (m of report.months; track m.month) {
+                      <tr>
+                        <td class="font-semibold text-fg">{{ monthLabel(m.month) }}</td>
+                        <td class="text-end text-muted tabular-nums">{{ m.attendance_days }}</td>
+                        <td class="text-end text-muted tabular-nums">{{ m.absence_days }}</td>
+                        <td class="text-end text-muted tabular-nums">{{ m.not_employed_days }}</td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ hours(m.overtime_hours) }}</span>
+                        </td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ hours(m.deduction_hours) }}</span>
+                        </td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ money(m.base_salary) }}</span>
+                        </td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ money(m.total_overtime_amount) }}</span>
+                        </td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ money(m.total_deduction_amount) }}</span>
+                        </td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ money(m.total_absence_amount) }}</span>
+                        </td>
+                        <td class="text-end font-semibold text-fg tabular-nums">
+                          <span dir="ltr">{{ money(m.net_salary) }}</span>
+                        </td>
+                        <td>
+                          <span [class]="isSourceSaved(m.source) ? 'chip-present' : 'chip-late'">
+                            {{ sourceLabelKey(m.source) | translate }}
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                    <!-- Bold totals row -->
+                    <tr class="bg-sunken font-bold text-fg">
+                      <td class="border-t-2 border-line-strong px-5 py-3.5">
+                        {{ 'salary.totalsRow' | translate }}
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        {{ report.totals.attendance_days }}
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        {{ report.totals.absence_days }}
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        {{ report.totals.not_employed_days }}
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        <span dir="ltr">{{ hours(report.totals.overtime_hours) }}</span>
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        <span dir="ltr">{{ hours(report.totals.deduction_hours) }}</span>
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        <span dir="ltr">{{ money(report.totals.total_base_salary) }}</span>
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        <span dir="ltr">{{ money(report.totals.total_overtime_amount) }}</span>
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        <span dir="ltr">{{ money(report.totals.total_deduction_amount) }}</span>
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        <span dir="ltr">{{ money(report.totals.total_absence_amount) }}</span>
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5 text-end tabular-nums">
+                        <span dir="ltr">{{ money(report.totals.total_net_salary) }}</span>
+                      </td>
+                      <td class="border-t-2 border-line-strong px-5 py-3.5"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <p class="mt-4 text-xs text-muted">{{ 'salary.tableNote' | translate }}</p>
+          }
+        }
+      }
+    }
+  }
+</div>

@@ -1,0 +1,87 @@
+<div class="page-narrow px-4 py-6 lg:px-8">
+  <div class="card">
+    <div class="mb-4 flex items-center justify-between gap-3">
+      <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
+        {{ (isEditMode() ? 'attendance.editTitle' : 'attendance.addTitle') | translate }}
+      </h1>
+      <button type="button" (click)="goBack()" class="btn-text">
+        {{ 'attendance.back' | translate }}
+      </button>
+    </div>
+
+    @if (loading()) {
+      <p class="text-sm text-muted">{{ 'common.loading' | translate }}</p>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        @if (errorMessage(); as error) {
+          <div class="banner-error mb-4" role="alert">
+            {{ error.key | translate: error.params }}
+          </div>
+        }
+
+        @if (isEditMode()) {
+          <div class="banner-muted mb-5">
+            {{ 'attendance.employeeLine' | translate: { name: employeeName(), date: recordDate() } }}
+          </div>
+        }
+
+        @if (!isEditMode()) {
+          <app-employee-picker (picked)="onEmployeePicked($event)" />
+        }
+
+        <div class="grid gap-x-6 md:grid-cols-2">
+          <div class="mb-5">
+            <label class="field-label mb-1.5 block" for="record_date">{{ 'common.date' | translate }}</label>
+            <input id="record_date" type="date" formControlName="record_date" class="field-input" />
+            @if (fieldError('record_date'); as key) {
+              <p class="field-error">{{ key | translate }}</p>
+            }
+          </div>
+
+          <div class="mb-5">
+            <label class="field-label mb-1.5 block" for="check_in_actual">
+              {{ 'attendance.checkInHeader' | translate }}
+            </label>
+            <input id="check_in_actual" type="time" formControlName="check_in_actual" class="field-input" />
+          </div>
+
+          <div class="mb-5">
+            <label class="field-label mb-1.5 block" for="check_out_actual">
+              {{ 'attendance.checkOutHeader' | translate }}
+            </label>
+            <input id="check_out_actual" type="time" formControlName="check_out_actual" class="field-input" />
+            @if (groupError('timeRange'); as key) {
+              <p class="field-error">{{ key | translate }}</p>
+            }
+            @if (groupError('atLeastOneTime'); as key) {
+              <p class="field-error">{{ key | translate }}</p>
+            }
+          </div>
+
+          @if (isEditMode()) {
+            <div class="mb-5">
+              <label class="field-label mb-1.5 block" for="note">
+                {{ 'attendance.note' | translate }}
+                <span class="font-normal text-muted">{{ 'attendance.optional' | translate }}</span>
+              </label>
+              <textarea
+                id="note"
+                formControlName="note"
+                rows="2"
+                [attr.placeholder]="'attendance.notePlaceholder' | translate"
+                class="field-input h-auto py-2"
+              ></textarea>
+            </div>
+          }
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button type="submit" [disabled]="form.invalid || saving()" class="btn-primary">
+            {{ (saving() ? 'common.saving' : 'common.save') | translate }}
+          </button>
+          <a routerLink="/attendance" class="btn-ghost">{{ 'common.cancel' | translate }}</a>
+        </div>
+      </form>
+    }
+  </div>
+</div>
