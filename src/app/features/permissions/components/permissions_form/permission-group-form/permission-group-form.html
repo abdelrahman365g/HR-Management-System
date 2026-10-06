@@ -1,0 +1,99 @@
+<div class="page-narrow px-4 py-6 lg:px-8">
+  <div>
+    <h1 class="mb-4 font-display text-2xl font-extrabold tracking-tight text-fg">
+      {{ (isEditMode() ? 'permissions.editTitle' : 'permissions.addTitle') | translate }}
+    </h1>
+
+    @if (loading()) {
+      <p class="text-sm text-muted">{{ 'common.loading' | translate }}</p>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        @if (errorMessage(); as error) {
+          <div class="banner-error mb-4" role="alert">
+            {{ error.key | translate: error.params }}
+          </div>
+        }
+
+        <div class="card mb-5">
+          <label class="field-label mb-1.5 block" for="name">
+            {{ 'permissions.groupName' | translate }}
+          </label>
+          <input id="name" type="text" formControlName="name" class="field-input" />
+          @if (form.get('name')?.invalid && form.get('name')?.touched) {
+            <p class="field-error">{{ 'permissions.groupNameRequired' | translate }}</p>
+          } @else if (groupSaved()) {
+            <p class="banner-success mt-2">{{ 'permissions.saved' | translate }}</p>
+          }
+        </div>
+
+        <div class="card mb-5">
+          <label class="field-label mb-2 block">{{ 'permissions.permissionsLabel' | translate }}</label>
+
+          @if (permissionsArray.invalid && permissionsArray.touched) {
+            <p class="field-error mb-2">{{ 'permissions.permissionsRequired' | translate }}</p>
+          }
+
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">{{ 'permissions.screenHeader' | translate }}</th>
+                  <th scope="col" class="w-20 text-center">{{ 'permissions.viewHeader' | translate }}</th>
+                  <th scope="col" class="w-20 text-center">{{ 'permissions.editHeader' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody formArrayName="permissions">
+                @for (row of permissionsArray.controls; track row.value.key; let i = $index) {
+                  <tr [formGroupName]="i">
+                    <td class="text-fg">{{ row.value.label | translate }}</td>
+                    <td class="text-center">
+                      <input
+                        type="checkbox"
+                        formControlName="view"
+                        class="size-4 accent-primary-600"
+                        (change)="onViewUnchecked(row)"
+                      />
+                    </td>
+                    <td class="text-center">
+                      <input
+                        type="checkbox"
+                        formControlName="edit"
+                        class="size-4 accent-primary-600"
+                        (change)="onEditChecked(row)"
+                      />
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex flex-wrap gap-3">
+            <button type="submit" [disabled]="saving()" class="btn-primary">
+              {{ (saving() ? 'common.saving' : 'common.save') | translate }}
+            </button>
+            <button type="button" (click)="resetForm()" class="btn-ghost">
+              {{ 'common.reset' | translate }}
+            </button>
+            <a routerLink="/permission-groups" class="btn-ghost">
+              {{ 'common.cancel' | translate }}
+            </a>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" (click)="viewAllPermissions()" class="btn-ghost">
+              {{ 'permissions.viewAll' | translate }}
+            </button>
+            <button type="button" (click)="editAllPermissions()" class="btn-ghost">
+              {{ 'permissions.editAll' | translate }}
+            </button>
+            <button type="button" (click)="clearAllPermissions()" class="btn-ghost">
+              {{ 'permissions.clearAll' | translate }}
+            </button>
+          </div>
+        </div>
+      </form>
+    }
+  </div>
+</div>
