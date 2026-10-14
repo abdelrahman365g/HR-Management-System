@@ -1,4 +1,4 @@
-<div class="page-narrow px-4 py-6 lg:px-8">
+<div class="page-narrow md:px-4 py-6 lg:px-8">
   <div>
     <h1 class="mb-2 font-display text-2xl font-extrabold tracking-tight text-fg">
       {{ 'settings.title' | translate }}
@@ -26,7 +26,14 @@
                 <label class="field-label mb-1.5 block" for="overtime_unit_hours">
                   {{ 'settings.overtimeUnit' | translate }}
                 </label>
-                <input id="overtime_unit_hours" type="text" inputmode="decimal" formControlName="overtime_unit_hours" dir="ltr" class="field-input" />
+                <input
+                  id="overtime_unit_hours"
+                  type="text"
+                  inputmode="decimal"
+                  formControlName="overtime_unit_hours"
+                  dir="ltr"
+                  class="field-input"
+                />
                 @if (fieldError('overtime_unit_hours'); as key) {
                   <p class="field-error">{{ key | translate }}</p>
                 }
@@ -36,7 +43,14 @@
                 <label class="field-label mb-1.5 block" for="overtime_rate_per_unit">
                   {{ 'settings.overtimeRate' | translate }}
                 </label>
-                <input id="overtime_rate_per_unit" type="text" inputmode="decimal" formControlName="overtime_rate_per_unit" dir="ltr" class="field-input" />
+                <input
+                  id="overtime_rate_per_unit"
+                  type="text"
+                  inputmode="decimal"
+                  formControlName="overtime_rate_per_unit"
+                  dir="ltr"
+                  class="field-input"
+                />
                 @if (fieldError('overtime_rate_per_unit'); as key) {
                   <p class="field-error">{{ key | translate }}</p>
                 }
@@ -46,7 +60,14 @@
                 <label class="field-label mb-1.5 block" for="deduction_unit_hours">
                   {{ 'settings.deductionUnit' | translate }}
                 </label>
-                <input id="deduction_unit_hours" type="text" inputmode="decimal" formControlName="deduction_unit_hours" dir="ltr" class="field-input" />
+                <input
+                  id="deduction_unit_hours"
+                  type="text"
+                  inputmode="decimal"
+                  formControlName="deduction_unit_hours"
+                  dir="ltr"
+                  class="field-input"
+                />
                 @if (fieldError('deduction_unit_hours'); as key) {
                   <p class="field-error">{{ key | translate }}</p>
                 }
@@ -56,7 +77,14 @@
                 <label class="field-label mb-1.5 block" for="deduction_rate_per_unit">
                   {{ 'settings.deductionRate' | translate }}
                 </label>
-                <input id="deduction_rate_per_unit" type="text" inputmode="decimal" formControlName="deduction_rate_per_unit" dir="ltr" class="field-input" />
+                <input
+                  id="deduction_rate_per_unit"
+                  type="text"
+                  inputmode="decimal"
+                  formControlName="deduction_rate_per_unit"
+                  dir="ltr"
+                  class="field-input"
+                />
                 @if (fieldError('deduction_rate_per_unit'); as key) {
                   <p class="field-error">{{ key | translate }}</p>
                 }
@@ -68,7 +96,11 @@
             }
 
             @if (canEdit()) {
-              <button type="submit" [disabled]="form.invalid || savingOvertime()" class="btn-primary">
+              <button
+                type="submit"
+                [disabled]="form.invalid || savingOvertime()"
+                class="btn-primary"
+              >
                 {{ (savingOvertime() ? 'common.saving' : 'common.save') | translate }}
               </button>
             }
@@ -98,7 +130,12 @@
           }
 
           @if (canEdit()) {
-            <button type="button" [disabled]="savingWeekly()" (click)="onSaveWeeklyHolidays()" class="btn-primary">
+            <button
+              type="button"
+              [disabled]="savingWeekly()"
+              (click)="onSaveWeeklyHolidays()"
+              class="btn-primary"
+            >
               {{ (savingWeekly() ? 'common.saving' : 'common.save') | translate }}
             </button>
           }

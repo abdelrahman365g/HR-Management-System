@@ -1,4 +1,4 @@
-<div class="page-narrow px-4 py-6 lg:px-8">
+<div class="page-narrow md:px-4 py-6 lg:px-8">
   <div>
     <h1 class="mb-4 font-display text-2xl font-extrabold tracking-tight text-fg">
       {{ (isEditMode() ? 'permissions.editTitle' : 'permissions.addTitle') | translate }}
@@ -27,7 +27,9 @@
         </div>
 
         <div class="card mb-5">
-          <label class="field-label mb-2 block">{{ 'permissions.permissionsLabel' | translate }}</label>
+          <label class="field-label mb-2 block">{{
+            'permissions.permissionsLabel' | translate
+          }}</label>
 
           @if (permissionsArray.invalid && permissionsArray.touched) {
             <p class="field-error mb-2">{{ 'permissions.permissionsRequired' | translate }}</p>
@@ -38,8 +40,12 @@
               <thead>
                 <tr>
                   <th scope="col">{{ 'permissions.screenHeader' | translate }}</th>
-                  <th scope="col" class="w-20 text-center">{{ 'permissions.viewHeader' | translate }}</th>
-                  <th scope="col" class="w-20 text-center">{{ 'permissions.editHeader' | translate }}</th>
+                  <th scope="col" class="w-20 text-center">
+                    {{ 'permissions.viewHeader' | translate }}
+                  </th>
+                  <th scope="col" class="w-20 text-center">
+                    {{ 'permissions.editHeader' | translate }}
+                  </th>
                 </tr>
               </thead>
               <tbody formArrayName="permissions">
