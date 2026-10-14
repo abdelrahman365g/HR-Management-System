@@ -320,8 +320,8 @@
     @apply bg-sunken text-[11px] font-semibold uppercase tracking-wider text-muted
            rtl:normal-case rtl:tracking-normal;
   }
-  .data-table thead th { @apply px-5 py-3.5 text-start font-semibold; }
-  .data-table tbody td { @apply border-t border-line px-5 py-3.5 align-middle; }
+  .data-table thead th { @apply px-2 md:px-4 lg:px-5 py-3.5 text-start font-semibold; }
+  .data-table tbody td { @apply border-t border-line px-2 md:px-4 lg:px-5 py-3.5 align-middle; }
   .data-table tbody tr { @apply hover:bg-canvas; }
 
   /* Centered page shells (Part 4) */

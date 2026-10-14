@@ -1,5 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EmployeesService } from '../../services/employees-service';
@@ -19,10 +27,7 @@ import {
   salaryValidator,
   timeRangeValidator,
 } from '../../../../shared/validators/employee.validators';
-import {
-  TranslatedMessage,
-  msg,
-} from '../../../../shared/utils/i18n-key.util';
+import { TranslatedMessage, msg } from '../../../../shared/utils/i18n-key.util';
 
 @Component({
   selector: 'app-employee-form',
@@ -52,15 +57,18 @@ export class EmployeeForm {
   private employeeId: string | null = null;
 
   readonly form: FormGroup = this.fb.group({
-    personal: this.fb.group({
-      full_name: ['', [Validators.required, nonEmptyValidator()]],
-      address: ['', [Validators.required, nonEmptyValidator()]],
-      phone_number: ['', [Validators.required, phoneValidator()]],
-      date_of_birth: ['', [Validators.required, ageValidator()]],
-      gender: ['', [Validators.required, Validators.pattern(/^(male|female)$/)]],
-      national_id: ['', [Validators.required, nationalIdValidator()]],
-      nationality: ['', [Validators.required, nonEmptyValidator()]],
-    }),
+    personal: this.fb.group(
+      {
+        full_name: ['', [Validators.required, nonEmptyValidator()]],
+        address: ['', [Validators.required, nonEmptyValidator()]],
+        phone_number: ['', [Validators.required, phoneValidator()]],
+        date_of_birth: ['', [Validators.required, ageValidator()]],
+        gender: ['', [Validators.required, Validators.pattern(/^(male|female)$/)]],
+        national_id: ['', [Validators.required, nationalIdValidator()]],
+        nationality: ['', [Validators.required, nonEmptyValidator()]],
+      },
+      { validators: egyptianNationalIdValidator() },
+    ),
     work: this.fb.group(
       {
         department_id: ['', [Validators.required]],
@@ -115,7 +123,6 @@ export class EmployeeForm {
             department_id: employee.department_id ?? '',
             contract_date: employee.contract_date,
             base_salary: employee.base_salary,
-            // Inputs use 'HH:mm'; the DB returns 'HH:mm:ss'.
             check_in_time: (employee.check_in_time ?? '').slice(0, 5),
             check_out_time: (employee.check_out_time ?? '').slice(0, 5),
           },
@@ -160,7 +167,6 @@ export class EmployeeForm {
     });
   }
 
-  /** Returns the translation key for the control's first error. */
   fieldError(path: string): string | null {
     const control = this.form.get(path);
     if (!control || control.valid || !control.touched) return null;
@@ -202,7 +208,6 @@ export class EmployeeForm {
     const message = String(err?.message ?? '');
 
     if (err?.code === '23505') {
-      // national_id is the only unique constraint on employees.
       this.form.get('personal.national_id')?.setErrors({ nationalIdDuplicate: true });
       return;
     }
@@ -230,4 +235,113 @@ export class EmployeeForm {
       msg(this.isEditMode() ? 'employees.updateFailed' : 'employees.createFailed'),
     );
   }
+}
+
+export function egyptianNationalIdValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const nidControl = control.get('national_id');
+    const dobControl = control.get('date_of_birth');
+    const genderControl = control.get('gender');
+
+    if (!nidControl || !dobControl || !genderControl) {
+      return null;
+    }
+
+    const nid = nidControl.value;
+    const dobValue = dobControl.value;
+    const gender = genderControl.value?.toLowerCase();
+
+    if (!nid || !dobValue || !gender || nid.length !== 14) {
+      return null;
+    }
+
+    const dob = new Date(dobValue);
+    const fullYear = dob.getFullYear();
+    const shortYear = fullYear % 100;
+    const month = dob.getMonth() + 1;
+    const day = dob.getDate();
+
+    const nidCentury = parseInt(nid.charAt(0), 10);
+    const nidYear = parseInt(nid.substring(1, 3), 10);
+    const nidMonth = parseInt(nid.substring(3, 5), 10);
+    const nidDay = parseInt(nid.substring(5, 7), 10);
+    const nidGov = nid.substring(7, 9);
+    const nidGenderDigit = parseInt(nid.charAt(12), 10);
+
+    let expectedCentury: number;
+
+    if (fullYear >= 1900 && fullYear <= 1999) {
+      expectedCentury = 2;
+    } else if (fullYear >= 2000 && fullYear <= 2099) {
+      expectedCentury = 3;
+    } else {
+      nidControl.setErrors({ ...nidControl.errors, nationalId: true }, { emitEvent: false });
+      return { national_Id: 'Year must be between 1900 and 2099' };
+    }
+
+    if (nidCentury !== expectedCentury) {
+      nidControl.setErrors({ ...nidControl.errors, nationalId: true }, { emitEvent: false });
+      return { national_Id: 'Century digit does not match birth year' };
+    }
+
+    if (shortYear !== nidYear || month !== nidMonth || day !== nidDay) {
+      nidControl.setErrors({ ...nidControl.errors, nationalId: true }, { emitEvent: false });
+      return { national_Id: 'Date of birth does not match NID' };
+    }
+
+    const validGovernorateCodes = [
+      '01',
+      '02',
+      '03',
+      '04',
+      '11',
+      '12',
+      '13',
+      '14',
+      '15',
+      '16',
+      '17',
+      '18',
+      '19',
+      '21',
+      '22',
+      '23',
+      '24',
+      '25',
+      '26',
+      '27',
+      '28',
+      '29',
+      '31',
+      '32',
+      '33',
+      '34',
+      '35',
+      '88',
+    ];
+
+    if (!validGovernorateCodes.includes(nidGov)) {
+      nidControl.setErrors({ ...nidControl.errors, nationalId: true }, { emitEvent: false });
+      return { national_Id: 'Invalid governorate code' };
+    }
+
+    if (
+      (gender === 'male' && nidGenderDigit % 2 === 0) ||
+      (gender === 'female' && nidGenderDigit % 2 !== 0)
+    ) {
+      nidControl.setErrors({ ...nidControl.errors, nationalId: true }, { emitEvent: false });
+      return { national_Id: 'Gender does not match NID' };
+    }
+
+    if (nidControl.errors) {
+      const { nationalId, ...otherErrors } = nidControl.errors;
+      if (Object.keys(otherErrors).length === 0) {
+        nidControl.setErrors(null, { emitEvent: false });
+      } else {
+        nidControl.setErrors(otherErrors, { emitEvent: false });
+      }
+    }
+
+    return null;
+  };
 }

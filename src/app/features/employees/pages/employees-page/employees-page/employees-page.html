@@ -1,4 +1,4 @@
-<div class="page px-4 py-6 lg:px-8">
+<div class="page md:px-4 py-6 lg:px-8">
   <div class="mb-4 flex items-center justify-between gap-3">
     <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
       {{ 'employees.title' | translate }}
@@ -47,52 +47,15 @@
     } @else if (employees().length === 0) {
       <p class="text-sm text-muted">{{ 'employees.empty' | translate }}</p>
     } @else {
-      <div class="card overflow-hidden p-0">
-        <div class="overflow-x-auto">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th scope="col">{{ 'employees.fullNameHeader' | translate }}</th>
-                <th scope="col" class="w-44">{{ 'employees.departmentHeader' | translate }}</th>
-                <th scope="col" class="w-36">{{ 'employees.phoneHeader' | translate }}</th>
-                <th scope="col" class="w-40">{{ 'employees.nationalIdHeader' | translate }}</th>
-                <th scope="col" class="w-36">{{ 'employees.contractDateHeader' | translate }}</th>
-                <th scope="col" class="w-36">{{ 'employees.baseSalaryHeader' | translate }}</th>
-                @if (canEdit()) {
-                  <th scope="col" class="w-32">{{ 'common.actions' | translate }}</th>
-                }
-              </tr>
-            </thead>
-            <tbody>
-              @for (employee of employees(); track employee.id) {
-                <tr>
-                  <td class="font-semibold text-fg">{{ employee.full_name }}</td>
-                  <td class="text-muted">{{ departmentName(employee) }}</td>
-                  <td class="text-muted">
-                    <span dir="ltr">{{ employee.phone_number }}</span>
-                  </td>
-                  <td class="text-muted">
-                    <span dir="ltr">{{ employee.national_id }}</span>
-                  </td>
-                  <td class="text-muted">{{ contractDate(employee) }}</td>
-                  <td class="text-muted tabular-nums">
-                    <span dir="ltr">{{ salary(employee) }}</span>
-                  </td>
-                  @if (canEdit()) {
-                    <td class="whitespace-nowrap">
-                      <a [routerLink]="[employee.id, 'edit']" class="btn-text me-3">
-                        {{ 'common.edit' | translate }}
-                      </a>
-                      <button type="button" (click)="onDelete(employee)" class="btn-text-danger">
-                        {{ 'common.delete' | translate }}
-                      </button>
-                    </td>
-                  }
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (employee of employees(); track employee.id) {
+          <app-employee-card
+            [employee]="employee"
+            [department]="departmentName(employee)"
+            [canEdit]="canEdit()"
+            (reload)="loadEmployees()"
+          ></app-employee-card>
+        }
       </div>
 
       <div class="mt-4 flex items-center gap-3 text-sm text-muted">

@@ -1,0 +1,198 @@
+<!--
+  Layout classes live on the inner wrapper only: a display utility (flex, grid, block)
+  on a closed <dialog> would override its default display:none and cover the page.
+  m-auto is needed because Tailwind's reset removes the browser's default centering margin.
+-->
+<dialog
+  #dialog
+  class="m-auto w-[calc(100%-2rem)] rounded-xl bg-surface p-0 text-fg shadow-lg backdrop:bg-ink/60"
+  [ngClass]="sizeClass()"
+  aria-labelledby="details-dialog-title"
+  (close)="onNativeClose()"
+  (click)="onBackdropClick($event)"
+>
+  @if (view(); as v) {
+    <div class="flex max-h-[calc(100dvh-2rem)] flex-col">
+      <!-- Header -->
+      <header class="flex items-start justify-between gap-4 border-b border-line px-6 py-4">
+        <div class="min-w-0">
+          <h2 id="details-dialog-title" class="font-display text-lg font-bold">
+            @if (v.title) {
+              {{ v.title }}
+            } @else if (v.titleKey) {
+              {{ v.titleKey | translate: v.titleParams }}
+            }
+          </h2>
+          @if (v.subtitle || v.subtitleKey) {
+            <p class="mt-0.5 text-sm text-muted">
+              @if (v.subtitle) {
+                {{ v.subtitle }}
+              } @else if (v.subtitleKey) {
+                {{ v.subtitleKey | translate }}
+              }
+            </p>
+          }
+        </div>
+        <button
+          type="button"
+          class="grid size-9 shrink-0 place-items-center rounded-md text-muted transition hover:bg-sunken hover:text-fg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary-600/20"
+          [attr.aria-label]="'detailsDialog.close' | translate"
+          (click)="close()"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            class="size-4.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </header>
+
+      <!-- Scrollable body -->
+      <div class="overflow-y-auto">
+        <!-- Highlights: the few values worth seeing at a glance -->
+        @if (v.highlights.length > 0) {
+          <div class="grid grid-cols-2 gap-3 px-6 py-4 sm:grid-cols-3">
+            @for (h of v.highlights; track $index) {
+              <div class="min-w-0 rounded-md bg-sunken p-3">
+                <div
+                  class="text-[11px] font-semibold uppercase tracking-wider text-muted rtl:normal-case rtl:tracking-normal"
+                >
+                  {{ h.labelKey | translate }}
+                </div>
+                <div
+                  class="mt-1 wrap-break-word"
+                  [ngClass]="
+                    h.emphasis
+                      ? 'font-display text-xl font-extrabold tabular-nums'
+                      : 'text-sm font-semibold'
+                  "
+                >
+                  <ng-container *ngTemplateOutlet="valueTpl; context: h" />
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @for (section of v.sections; track $index) {
+          <section class="border-t border-line px-6 py-4 first:border-t-0">
+            @if (section.titleKey) {
+              <h3 class="mb-3 font-display text-sm font-bold">
+                {{ section.titleKey | translate }}
+              </h3>
+            }
+
+            @if (section.kind === 'fields') {
+              <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                @for (f of section.fields; track $index) {
+                  <div class="min-w-0" [ngClass]="f.span === 2 ? 'sm:col-span-2' : ''">
+                    <dt
+                      class="text-[11px] font-semibold uppercase tracking-wider text-muted rtl:normal-case rtl:tracking-normal"
+                    >
+                      {{ f.labelKey | translate }}
+                    </dt>
+                    <dd
+                      class="mt-1 wrap-break-word text-sm"
+                      [ngClass]="
+                        f.emphasis ? 'font-display text-xl font-extrabold tabular-nums' : ''
+                      "
+                    >
+                      <ng-container *ngTemplateOutlet="valueTpl; context: f" />
+                    </dd>
+                  </div>
+                }
+              </dl>
+            } @else {
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead
+                    class="text-[11px] font-semibold uppercase tracking-wider text-muted rtl:normal-case rtl:tracking-normal"
+                  >
+                    <tr>
+                      @for (col of section.columns; track $index) {
+                        <th
+                          scope="col"
+                          class="py-2 pe-4 font-semibold"
+                          [ngClass]="col.align === 'end' ? 'text-end' : 'text-start'"
+                        >
+                          {{ col.labelKey | translate }}
+                        </th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of section.rows; track $index) {
+                      <tr class="border-t border-line align-top">
+                        @for (cell of row; track $index) {
+                          <td
+                            class="py-2 pe-4"
+                            [ngClass]="cell.align === 'end' ? 'text-end' : 'text-start'"
+                          >
+                            <ng-container *ngTemplateOutlet="valueTpl; context: cell" />
+                          </td>
+                        }
+                      </tr>
+                    } @empty {
+                      <tr class="border-t border-line">
+                        <td class="py-3 text-muted" [attr.colspan]="section.columns.length">
+                          {{ section.emptyKey ?? 'detailsDialog.noRows' | translate }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                  @if (section.footer; as footer) {
+                    <tfoot>
+                      <tr class="border-t-2 border-line font-bold">
+                        @for (cell of footer; track $index) {
+                          <td
+                            class="py-2 pe-4"
+                            [ngClass]="cell.align === 'end' ? 'text-end' : 'text-start'"
+                          >
+                            @if ($first && section.footerLabelKey) {
+                              {{ section.footerLabelKey | translate }}
+                            } @else {
+                              <ng-container *ngTemplateOutlet="valueTpl; context: cell" />
+                            }
+                          </td>
+                        }
+                      </tr>
+                    </tfoot>
+                  }
+                </table>
+              </div>
+            }
+          </section>
+        }
+      </div>
+
+      <!-- Footer -->
+      <footer class="flex justify-end border-t border-line px-6 py-3">
+        <button type="button" class="btn-ghost" data-autofocus (click)="close()">
+          {{ 'detailsDialog.close' | translate }}
+        </button>
+      </footer>
+    </div>
+  }
+</dialog>
+
+<!-- One value: shared by highlights, fields and table cells -->
+<ng-template #valueTpl let-display="display" let-type="type" let-tone="tone" let-suffix="suffixKey">
+  @if (display.pre) {
+    <pre
+      class="whitespace-pre-wrap rounded-md bg-sunken p-3 text-start font-mono text-xs"
+      dir="ltr"
+      >{{ display.text }}</pre>
+  } @else if (type === 'badge' && !display.empty) {
+    <span class="chip" [ngClass]="toneClass(tone)">{{ valueText(display, suffix) }}</span>
+  } @else {
+    <span [ngClass]="valueClass(display)" [attr.dir]="display.ltr ? 'ltr' : null">{{
+      valueText(display, suffix)
+    }}</span>
+  }
+</ng-template>

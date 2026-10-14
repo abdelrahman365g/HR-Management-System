@@ -31,11 +31,11 @@ import {
   periodLabel,
   yearlyReportFileName,
 } from '../../../../../shared/utils/payslip-pdf.util';
-import {
-  buildMonthlyReportPdf,
-  buildYearlyReportPdf,
-} from '../../../utils/salary-report-pdf.util';
+import { buildMonthlyReportPdf, buildYearlyReportPdf } from '../../../utils/salary-report-pdf.util';
 import { TranslatedMessage, msg } from '../../../../../shared/utils/i18n-key.util';
+import { SalaryReportCard } from '../../../components/salary-report-card/salary-report-card';
+import { DetailsDialogService } from '../../../../../core/services/details-dialog.service';
+import { DetailField } from '../../../../../core/interfaces/details-dialog.interface';
 
 const PAGE_SIZE = 10;
 
@@ -43,7 +43,7 @@ type ReportMode = 'monthly' | 'yearly';
 
 @Component({
   selector: 'app-salary-reports-page',
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe, SalaryReportCard],
   templateUrl: './salary-reports-page.html',
   styleUrl: './salary-reports-page.css',
 })
@@ -55,6 +55,7 @@ export class SalaryReportsPage {
   private readonly confirm = inject(ConfirmService);
   private readonly translate = inject(TranslateService);
   protected readonly languageService = inject(LanguageService);
+  private readonly details = inject(DetailsDialogService);
 
   readonly rows = signal<SalaryReportRow[]>([]);
   readonly yearlyReport = signal<YearlySalaryReport | null>(null);
@@ -69,6 +70,7 @@ export class SalaryReportsPage {
   readonly total = signal(0);
   readonly pageSize = PAGE_SIZE;
   readonly mode = signal<ReportMode>('monthly');
+  readonly isMobile = signal(window.innerWidth < 1024);
 
   readonly canView = signal(this.authService.hasPermission('salary_reports', 'view'));
   readonly canEdit = signal(this.authService.hasPermission('salary_reports', 'edit'));
@@ -108,14 +110,12 @@ export class SalaryReportsPage {
   constructor() {
     this.departmentsService.listDepartments().subscribe({
       next: (departments) => this.departments.set(departments),
-      error: () => {
-      },
+      error: () => {},
     });
 
     this.salaryReportsService.getFoundingYear().subscribe({
       next: (year) => this.minYear.set(year),
-      error: () => {
-      },
+      error: () => {},
     });
 
     if (this.canView()) {
@@ -172,11 +172,7 @@ export class SalaryReportsPage {
             this.errorMessage.set(msg(this.salaryMessages().invalidEmployee));
             return;
           }
-          if (this.isMonthly()) {
-            this.runQuery(selectedMonth, selectedYear, matches[0].id, department_id || null);
-          } else {
-            this.loadYearlyReport(matches[0].id, selectedYear);
-          }
+          this.runQuery(selectedMonth, selectedYear, matches[0].id, department_id || null);
         },
         error: () => {
           this.loading.set(false);
@@ -305,9 +301,8 @@ export class SalaryReportsPage {
             this.salaryMessages()
               .beforeJoiningLine.replace('{days}', String(row.not_employed_days))
               .replace('{rate}', formatMoney(row.daily_rate)),
-            formatMoney(
-              Math.round(row.not_employed_days * row.daily_rate * 100) / 100,
-            ) + ` ${CURRENCY_CODE}`,
+            formatMoney(Math.round(row.not_employed_days * row.daily_rate * 100) / 100) +
+              ` ${CURRENCY_CODE}`,
           ]
         : null,
       null,
@@ -347,17 +342,13 @@ export class SalaryReportsPage {
       );
 
       if (rows === null) {
-        this.errorMessage.set(
-          msg('salary.reportCapReachedText', { cap: 2000 }),
-        );
+        this.errorMessage.set(msg('salary.reportCapReachedText', { cap: 2000 }));
         return;
       }
 
       const { month, year } = this.form.getRawValue();
       const employeeFilter = String(this.form.getRawValue().employeeName ?? '').trim();
-      const department = this.departments().find(
-        (d) => d.id === this.lastQuery?.departmentId,
-      );
+      const department = this.departments().find((d) => d.id === this.lastQuery?.departmentId);
 
       await buildMonthlyReportPdf({
         companyName: this.companyName,
@@ -371,32 +362,6 @@ export class SalaryReportsPage {
         pageOfTemplate: this.salaryMessages().pageOf,
         fileName: monthlyReportFileName(Number(year), Number(month)),
         rows,
-      });
-    } catch {
-      this.errorMessage.set(msg(this.salaryMessages().printFailed));
-    } finally {
-      this.printing.set(false);
-    }
-  }
-
-  /** Prints the yearly report for the currently loaded employee. */
-  async onPrintYearlyReport(): Promise<void> {
-    const report = this.yearlyReport();
-    if (!report || this.printing()) return;
-
-    this.printing.set(true);
-    this.errorMessage.set(null);
-
-    try {
-      await buildYearlyReportPdf({
-        companyName: this.companyName,
-        currencyCode: this.currencyCode,
-        pageOfTemplate: this.salaryMessages().pageOf,
-        liveNotice: 'The current month is live and not final yet.',
-        snapshotCoverageTemplate: this.salaryMessages().snapshotCoverage,
-        fileName: yearlyReportFileName(report.employee.name, report.year),
-        generatedOn: null,
-        report,
       });
     } catch {
       this.errorMessage.set(msg(this.salaryMessages().printFailed));
@@ -433,23 +398,6 @@ export class SalaryReportsPage {
       error: (err) => {
         this.savingSnapshot.set(false);
         this.errorMessage.set(this.describeSnapshotError(err));
-      },
-    });
-  }
-
-  private loadYearlyReport(employeeId: string, year: number): void {
-    this.loading.set(true);
-    this.salaryReportsService.getYearlyReport(employeeId, year).subscribe({
-      next: (report) => {
-        this.yearlyReport.set(report);
-        this.searched.set(true);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.yearlyReport.set(null);
-        this.searched.set(true);
-        this.loading.set(false);
-        this.errorMessage.set(this.describeReportError(err));
       },
     });
   }
@@ -526,5 +474,120 @@ export class SalaryReportsPage {
       return msg(this.salaryMessages().settingsMissing);
     }
     return msg(this.salaryMessages().snapshotFailed);
+  }
+
+  onView(row: SalaryReportRow): void {
+    const { month, year } = this.form.getRawValue();
+    const period = new Intl.DateTimeFormat(document.documentElement.lang || 'en', {
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(new Date(Date.UTC(year, month - 1, 1)));
+
+    void this.details.open({
+      titleKey: 'salaryDetails.title',
+      titleParams: { name: row.employee_name },
+      subtitle: period,
+      size: 'lg',
+      data: row,
+      highlights: [
+        {
+          path: 'net_salary',
+          labelKey: 'salaryDetails.fields.netSalary',
+          type: 'money',
+          currency: CURRENCY_CODE,
+          emphasis: true,
+        },
+        {
+          path: 'attendance_days',
+          labelKey: 'salaryDetails.fields.attendanceDays',
+          type: 'number',
+        },
+      ],
+      sections: [
+        {
+          kind: 'fields',
+          titleKey: 'salaryDetails.sections.employee',
+          fields: [
+            { path: 'employee_name', labelKey: 'salaryDetails.fields.employeeName' },
+            { path: 'department_name', labelKey: 'salaryDetails.fields.department' },
+            { path: 'national_id', labelKey: 'salaryDetails.fields.nationalId', type: 'id' },
+            {
+              path: 'generated_at',
+              labelKey: 'salaryDetails.fields.generatedAt',
+              type: 'datetime',
+              hideWhenEmpty: true,
+            },
+          ],
+        },
+        {
+          kind: 'fields',
+          titleKey: 'salaryDetails.sections.attendance',
+          fields: [
+            { path: 'absence_days', labelKey: 'salaryDetails.fields.absenceDays', type: 'number' },
+            ...((row.not_employed_days ?? 0) > 0
+              ? [
+                  {
+                    path: 'not_employed_days',
+                    labelKey: 'salaryDetails.fields.notEmployedDays',
+                    type: 'number',
+                    hideWhenEmpty: true,
+                  } as DetailField,
+                ]
+              : []),
+            {
+              path: 'overtime_hours',
+              labelKey: 'salaryDetails.fields.overtimeHours',
+              type: 'number',
+              decimals: 2,
+              suffixKey: 'salaryDetails.unit.hours',
+            },
+            {
+              path: 'deduction_hours',
+              labelKey: 'salaryDetails.fields.deductionHours',
+              type: 'number',
+              decimals: 2,
+              suffixKey: 'salaryDetails.unit.hours',
+            },
+          ],
+        },
+        {
+          kind: 'fields',
+          titleKey: 'salaryDetails.sections.amounts',
+          fields: [
+            {
+              path: 'base_salary',
+              labelKey: 'salaryDetails.fields.baseSalary',
+              type: 'money',
+              currency: CURRENCY_CODE,
+            },
+            {
+              path: 'daily_rate',
+              labelKey: 'salaryDetails.fields.dailyRate',
+              type: 'money',
+              currency: CURRENCY_CODE,
+            },
+            {
+              path: 'total_overtime_amount',
+              labelKey: 'salaryDetails.fields.overtimeAmount',
+              type: 'money',
+              currency: CURRENCY_CODE,
+            },
+            {
+              path: 'total_deduction_amount',
+              labelKey: 'salaryDetails.fields.deductionAmount',
+              type: 'money',
+              currency: CURRENCY_CODE,
+            },
+            {
+              path: 'total_absence_amount',
+              labelKey: 'salaryDetails.fields.absenceAmount',
+              type: 'money',
+              currency: CURRENCY_CODE,
+            },
+          ],
+        },
+      ],
+    });
   }
 }

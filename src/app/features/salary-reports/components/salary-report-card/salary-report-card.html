@@ -1,0 +1,137 @@
+<article class="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4 shadow-sm">
+  <div class="flex justify-between">
+    <header>
+      <h3 class="truncate text-base font-semibold text-fg">{{ row()?.employee_name }}</h3>
+      <span class="mt-1 inline-block rounded-full bg-canvas px-2 py-0.5 text-xs">
+        {{ row()?.department_name ?? '-' }}
+      </span>
+    </header>
+    <div class="flex items-start gap-2">
+      <button
+        class="grid size-10 place-items-center rounded-xl border border-sky-500 bg-sky-50 text-sky-600 transition hover:bg-sky-500 hover:text-white"
+        (click)="onView()"
+        aria-label="View employee"
+      >
+        <svg
+          class="size-4.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </button>
+
+      <button
+        class="grid size-10 place-items-center rounded-xl border border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 dark:border-primary-500/30 dark:bg-primary-500/15 dark:text-primary-200 dark:hover:bg-primary-500/25"
+        (click)="print.emit(row()!)"
+        aria-label="Print employee"
+      >
+        <svg
+          class="size-4.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M6 9V3h12v6" />
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+          <rect x="6" y="14" width="12" height="8" rx="1" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+    <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.baseSalaryHeader' | translate: { currency: currencyCode() } }}
+      </dt>
+      <dd class="mt-0.5 text-sm text-fg">
+        <span class="hover:underline">{{ row()?.base_salary }}</span>
+      </dd>
+    </div>
+
+    <!-- <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.attendanceDaysHeader' | translate }}
+      </dt>
+      <dd class="mt-0.5 break-all text-sm text-fg">{{ row()?.attendance_days }}</dd>
+    </div>
+
+    <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.absenceDaysHeader' | translate }}
+      </dt>
+      <dd class="mt-0.5 text-sm text-fg">
+        {{ row()?.absence_days }}
+      </dd>
+    </div>
+    @if ((row()?.not_employed_days ?? 0) > 0) {
+      <div>
+        <dt class="text-[11px] uppercase tracking-wide text-base">
+          {{ 'salary.notEmployedColumn' | translate }}
+        </dt>
+        <dd class="mt-0.5 text-sm text-fg">
+          {{ row()?.not_employed_days }}
+        </dd>
+      </div>
+    }
+    <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.overtimeHoursHeader' | translate }}
+      </dt>
+      <dd class="mt-0.5 text-sm font-medium text-fg">
+        {{ row()?.overtime_hours }}
+      </dd>
+    </div>
+    <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.deductionHoursHeader' | translate }}
+      </dt>
+      <dd class="mt-0.5 text-sm font-medium text-fg">
+        {{ row()?.deduction_hours }}
+      </dd>
+    </div> -->
+    <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.totalOvertime' | translate }}
+      </dt>
+      <dd class="mt-0.5 text-sm font-medium text-fg">
+        {{ row()?.total_overtime_amount }}
+      </dd>
+    </div>
+    <!-- <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.totalDeduction' | translate }}
+      </dt>
+      <dd class="mt-0.5 text-sm font-medium text-fg">
+        {{ row()?.total_deduction_amount }}
+      </dd>
+    </div> -->
+    <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.deductionSum' | translate }}
+      </dt>
+      <dd class="mt-0.5 text-sm font-medium text-fg">
+        {{ (row()?.total_absence_amount ?? 0) + (row()?.total_deduction_amount ?? 0) }}
+      </dd>
+    </div>
+    <div>
+      <dt class="text-[11px] uppercase tracking-wide text-base">
+        {{ 'salary.netSalaryHeader' | translate: { currency: currencyCode() } }}
+      </dt>
+      <dd class="mt-0.5 text-sm font-medium text-fg">
+        {{ row()?.net_salary }}
+      </dd>
+    </div>
+  </div>
+</article>
