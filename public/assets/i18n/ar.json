@@ -6,6 +6,7 @@
     "cancel": "إلغاء",
     "edit": "تعديل",
     "delete": "حذف",
+    "view": "عرض",
     "search": "بحث",
     "actions": "الإجراءات",
     "loading": "جارٍ التحميل…",
@@ -273,9 +274,9 @@
   },
   "validation": {
     "required": "هذا الحقل مطلوب.",
-    "phone": "يرجى إدخال رقم هاتف صالح.",
+    "phone": "يرجى إدخال رقم هاتف مصري صالح.",
     "age": "يجب ألا يقل عمر الموظف عن 20 عامًا.",
-    "nationalId": "يجب أن يتكون الرقم القومي من 14 رقمًا بالضبط.",
+    "nationalId": "يرجى إدخال رقم قومي مصري صحيح.",
     "nationalIdDuplicate": "يوجد موظف بهذا الرقم القومي بالفعل.",
     "contractDate": "لا يمكن أن يسبق تاريخ التعاقد تاريخ تأسيس الشركة.",
     "salary": "يجب أن يكون الراتب رقمًا موجبًا بحد أقصى منزلتين عشريتين.",
@@ -456,6 +457,7 @@
     "overtimeHoursHeader": "ساعات العمل الإضافي",
     "deductionHoursHeader": "ساعات الخصم",
     "lateEarlyHoursHeader": "ساعات التأخير / الانصراف المبكر",
+    "deductionSum": "إجمالي الخصم",
     "totalOvertimeHeader": "إجمالي العمل الإضافي ({{currency}})",
     "lateEarlyDeductionHeader": "خصم التأخير / الانصراف المبكر ({{currency}})",
     "absenceDeductionHeader": "خصم الغياب ({{currency}})",
@@ -480,5 +482,57 @@
     "title": "الصفحة غير موجودة",
     "message": "الصفحة التي تبحث عنها غير موجودة أو ليس لديك صلاحية للوصول إليها.",
     "backToDashboard": "العودة إلى لوحة التحكم"
+  },
+  "detailsDialog": {
+    "close": "إغلاق",
+    "yes": "نعم",
+    "no": "لا",
+    "noRows": "لا يوجد شيء لعرضه."
+  },
+  "auditLog": {
+    "details": {
+      "title": "تفاصيل التغيير",
+      "changes": "ما الذي تغيّر",
+      "view": "عرض"
+    }
+  },
+  "salaryDetails": {
+    "title": "{{name}}",
+    "view": "عرض",
+    "sections": {
+      "employee": "الموظف",
+      "attendance": "الحضور",
+      "hours": "الساعات",
+      "amounts": "المبالغ",
+      "months": "شهرًا بشهر"
+    },
+    "fields": {
+      "employeeName": "الموظف",
+      "nationalId": "الرقم القومي",
+      "department": "القسم",
+      "source": "المصدر",
+      "generatedAt": "تاريخ الحفظ",
+      "attendanceDays": "أيام الحضور",
+      "absenceDays": "أيام الغياب",
+      "notEmployedDays": "أيام قبل الالتحاق",
+      "overtimeHours": "ساعات العمل الإضافي",
+      "deductionHours": "ساعات الخصم",
+      "baseSalary": "الراتب الأساسي",
+      "dailyRate": "المعدل اليومي",
+      "overtimeAmount": "إجمالي العمل الإضافي",
+      "deductionAmount": "إجمالي الخصم",
+      "absenceAmount": "خصم الغياب",
+      "netSalary": "صافي الراتب",
+      "month": "الشهر",
+      "total": "الإجمالي"
+    },
+    "source": {
+      "live": "مباشر",
+      "snapshot": "محفوظ"
+    },
+    "unit": {
+      "hours": "س",
+      "days": "ي"
+    }
   }
 }

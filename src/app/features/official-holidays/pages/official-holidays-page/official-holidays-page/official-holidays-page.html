@@ -1,4 +1,4 @@
-<div class="page-narrow px-4 py-6 lg:px-8">
+<div class="page-narrow md:px-4 py-6 lg:px-8">
   <div>
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
@@ -31,7 +31,9 @@
         <form [formGroup]="form" (ngSubmit)="onCreate()" class="card mb-6">
           <div class="flex flex-wrap items-start gap-4">
             <div>
-              <label class="field-label mb-1.5 block" for="name">{{ 'holidays.name' | translate }}</label>
+              <label class="field-label mb-1.5 block" for="name">{{
+                'holidays.name' | translate
+              }}</label>
               <input
                 id="name"
                 type="text"
@@ -47,16 +49,17 @@
               <label class="field-label mb-1.5 block" for="holiday_date">
                 {{ 'holidays.date' | translate }}
               </label>
-              <input id="holiday_date" type="date" formControlName="holiday_date" class="field-input w-auto" />
+              <input
+                id="holiday_date"
+                type="date"
+                formControlName="holiday_date"
+                class="field-input w-auto"
+              />
               @if (fieldError('holiday_date'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
             </div>
-            <button
-              type="submit"
-              [disabled]="form.invalid || saving()"
-              class="btn-primary mt-6"
-            >
+            <button type="submit" [disabled]="form.invalid || saving()" class="btn-primary mt-6">
               {{ (saving() ? 'common.adding' : 'common.add') | translate }}
             </button>
           </div>
@@ -66,7 +69,9 @@
       @if (loading()) {
         <p class="text-sm text-muted">{{ 'holidays.loading' | translate }}</p>
       } @else if (holidays().length === 0) {
-        <p class="text-sm text-muted">{{ 'holidays.empty' | translate: { year: selectedYear() } }}</p>
+        <p class="text-sm text-muted">
+          {{ 'holidays.empty' | translate: { year: selectedYear() } }}
+        </p>
       } @else {
         <div class="card overflow-hidden p-0">
           <div class="overflow-x-auto">
@@ -74,10 +79,12 @@
               <thead>
                 <tr>
                   <th scope="col">{{ 'holidays.nameHeader' | translate }}</th>
-                  <th scope="col" class="w-40">{{ 'holidays.dateHeader' | translate }}</th>
-                  <th scope="col" class="w-40">{{ 'holidays.weekdayHeader' | translate }}</th>
+                  <th scope="col" class="w-28 md:w-40">{{ 'holidays.dateHeader' | translate }}</th>
+                  <th scope="col" class="hidden md:table-cell md:w-40">
+                    {{ 'holidays.weekdayHeader' | translate }}
+                  </th>
                   @if (canEdit()) {
-                    <th scope="col" class="w-24">{{ 'common.actions' | translate }}</th>
+                    <th scope="col" class="md:w-24">{{ 'common.actions' | translate }}</th>
                   }
                 </tr>
               </thead>
@@ -86,7 +93,7 @@
                   <tr>
                     <td class="font-semibold text-fg">{{ holiday.name }}</td>
                     <td class="text-muted">{{ dateLabel(holiday) }}</td>
-                    <td class="text-muted">{{ weekdayLabel(holiday) }}</td>
+                    <td class="hidden md:table-cell text-muted">{{ weekdayLabel(holiday) }}</td>
                     @if (canEdit()) {
                       <td class="whitespace-nowrap">
                         <button type="button" (click)="onDelete(holiday)" class="btn-text-danger">

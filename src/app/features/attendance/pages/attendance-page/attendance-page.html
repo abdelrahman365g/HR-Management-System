@@ -1,4 +1,4 @@
-<div class="page px-4 py-6 lg:px-8">
+<div class="page md:px-4 py-6 lg:px-8">
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
       {{ 'attendance.title' | translate }}
@@ -35,7 +35,12 @@
           <label class="field-label mb-1.5 block" for="employeeName">
             {{ 'attendance.employeeName' | translate }}
           </label>
-          <input id="employeeName" type="text" formControlName="employeeName" class="field-input w-56" />
+          <input
+            id="employeeName"
+            type="text"
+            formControlName="employeeName"
+            class="field-input w-56"
+          />
         </div>
         <div>
           <label class="field-label mb-1.5 block" for="department_id">
@@ -49,13 +54,20 @@
           </select>
         </div>
         <div>
-          <label class="field-label mb-1.5 block" for="dateFrom">{{ 'attendance.from' | translate }}</label>
+          <label class="field-label mb-1.5 block" for="dateFrom">{{
+            'attendance.from' | translate
+          }}</label>
           <input id="dateFrom" type="date" formControlName="dateFrom" class="field-input w-auto" />
         </div>
         <div>
-          <label class="field-label mb-1.5 block" for="dateTo">{{ 'attendance.to' | translate }}</label>
+          <label class="field-label mb-1.5 block" for="dateTo">{{
+            'attendance.to' | translate
+          }}</label>
           <input id="dateTo" type="date" formControlName="dateTo" class="field-input w-auto" />
-          @if (form.hasError('dateRange') && (form.get('dateFrom')?.touched || form.get('dateTo')?.touched)) {
+          @if (
+            form.hasError('dateRange') &&
+            (form.get('dateFrom')?.touched || form.get('dateTo')?.touched)
+          ) {
             <p class="field-error">{{ attendanceMessages.invalidDateRange | translate }}</p>
           }
         </div>
@@ -80,8 +92,12 @@
             <table class="data-table">
               <thead>
                 <tr>
-                  <th scope="col" class="w-12">{{ 'attendance.indexHeader' | translate }}</th>
-                  <th scope="col" class="w-44">{{ 'attendance.department' | translate }}</th>
+                  <th scope="col" class="w-12 hidden md:table-cell">
+                    {{ 'attendance.indexHeader' | translate }}
+                  </th>
+                  <th scope="col" class="hidden lg:w-44">
+                    {{ 'attendance.department' | translate }}
+                  </th>
                   <th scope="col">{{ 'attendance.employeeName' | translate }}</th>
                   <th scope="col" class="w-28">{{ 'attendance.checkInHeader' | translate }}</th>
                   <th scope="col" class="w-28">{{ 'attendance.checkOutHeader' | translate }}</th>
@@ -94,15 +110,19 @@
               <tbody>
                 @for (record of records(); track record.id) {
                   <tr>
-                    <td class="text-muted">{{ $index + 1 }}</td>
-                    <td class="text-muted">
+                    <td class="text-muted hidden md:table-cell">{{ $index + 1 }}</td>
+                    <td class="hidden lg:table-cell text-muted">
                       {{ record.employees?.departments?.name ?? '—' }}
                     </td>
                     <td class="font-semibold text-fg">
                       {{ record.employees?.full_name }}
                     </td>
-                    <td class="text-muted tabular-nums"><span dir="ltr">{{ record.check_in_actual?.slice(0, 5) ?? '—' }}</span></td>
-                    <td class="text-muted tabular-nums"><span dir="ltr">{{ record.check_out_actual?.slice(0, 5) ?? '—' }}</span></td>
+                    <td class="text-muted tabular-nums">
+                      <span dir="ltr">{{ record.check_in_actual?.slice(0, 5) ?? '—' }}</span>
+                    </td>
+                    <td class="text-muted tabular-nums">
+                      <span dir="ltr">{{ record.check_out_actual?.slice(0, 5) ?? '—' }}</span>
+                    </td>
                     <td class="text-muted">{{ recordDate(record.record_date) }}</td>
                     @if (isHrAdmin()) {
                       <td class="whitespace-nowrap">
@@ -119,11 +139,24 @@
         </div>
 
         <div class="mt-4 flex items-center gap-3 text-sm text-muted">
-          <button type="button" [disabled]="!hasPrev()" (click)="goToPage(page() - 1)" class="btn-ghost h-9 px-3">
+          <button
+            type="button"
+            [disabled]="!hasPrev()"
+            (click)="goToPage(page() - 1)"
+            class="btn-ghost h-9 px-3"
+          >
             {{ 'common.previous' | translate }}
           </button>
-          <span>{{ 'common.pageOf' | translate: { page: page() + 1, totalPages: totalPages(), total: total() } }}</span>
-          <button type="button" [disabled]="!hasNext()" (click)="goToPage(page() + 1)" class="btn-ghost h-9 px-3">
+          <span>{{
+            'common.pageOf'
+              | translate: { page: page() + 1, totalPages: totalPages(), total: total() }
+          }}</span>
+          <button
+            type="button"
+            [disabled]="!hasNext()"
+            (click)="goToPage(page() + 1)"
+            class="btn-ghost h-9 px-3"
+          >
             {{ 'common.next' | translate }}
           </button>
         </div>
