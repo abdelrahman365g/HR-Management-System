@@ -19,7 +19,9 @@
 
           <div class="grid gap-x-6 md:grid-cols-2">
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="full_name">{{ 'employees.fullName' | translate }}</label>
+              <label class="field-label mb-1.5 block" for="full_name">{{
+                'employees.fullName' | translate
+              }}</label>
               <input id="full_name" type="text" formControlName="full_name" class="field-input" />
               @if (fieldError('personal.full_name'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
@@ -27,7 +29,9 @@
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="address">{{ 'employees.address' | translate }}</label>
+              <label class="field-label mb-1.5 block" for="address">{{
+                'employees.address' | translate
+              }}</label>
               <input id="address" type="text" formControlName="address" class="field-input" />
               @if (fieldError('personal.address'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
@@ -35,23 +39,41 @@
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="phone_number">{{ 'employees.phone' | translate }}</label>
-              <input id="phone_number" type="text" inputmode="numeric" formControlName="phone_number" dir="ltr" class="field-input" />
+              <label class="field-label mb-1.5 block" for="phone_number">{{
+                'employees.phone' | translate
+              }}</label>
+              <input
+                id="phone_number"
+                type="text"
+                inputmode="numeric"
+                formControlName="phone_number"
+                dir="ltr"
+                class="field-input"
+              />
               @if (fieldError('personal.phone_number'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="date_of_birth">{{ 'employees.dateOfBirth' | translate }}</label>
-              <input id="date_of_birth" type="date" formControlName="date_of_birth" class="field-input" />
+              <label class="field-label mb-1.5 block" for="date_of_birth">{{
+                'employees.dateOfBirth' | translate
+              }}</label>
+              <input
+                id="date_of_birth"
+                type="date"
+                formControlName="date_of_birth"
+                class="field-input"
+              />
               @if (fieldError('personal.date_of_birth'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="gender">{{ 'employees.gender' | translate }}</label>
+              <label class="field-label mb-1.5 block" for="gender">{{
+                'employees.gender' | translate
+              }}</label>
               <select id="gender" formControlName="gender" class="field-input">
                 <option value="" disabled>{{ 'employees.selectGender' | translate }}</option>
                 <option value="male">{{ 'employees.male' | translate }}</option>
@@ -63,16 +85,32 @@
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="national_id">{{ 'employees.nationalId' | translate }}</label>
-              <input id="national_id" type="text" inputmode="numeric" formControlName="national_id" dir="ltr" class="field-input" />
+              <label class="field-label mb-1.5 block" for="national_id">{{
+                'employees.nationalId' | translate
+              }}</label>
+              <input
+                id="national_id"
+                type="text"
+                inputmode="numeric"
+                formControlName="national_id"
+                dir="ltr"
+                class="field-input"
+              />
               @if (fieldError('personal.national_id'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="nationality">{{ 'employees.nationality' | translate }}</label>
-              <input id="nationality" type="text" formControlName="nationality" class="field-input" />
+              <label class="field-label mb-1.5 block" for="nationality">{{
+                'employees.nationality' | translate
+              }}</label>
+              <input
+                id="nationality"
+                type="text"
+                formControlName="nationality"
+                class="field-input"
+              />
               @if (fieldError('personal.nationality'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
@@ -85,9 +123,13 @@
 
           <div class="grid gap-x-6 md:grid-cols-2">
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="department_id">{{ 'employees.department' | translate }}</label>
+              <label class="field-label mb-1.5 block" for="department_id">{{
+                'employees.department' | translate
+              }}</label>
               <select id="department_id" formControlName="department_id" class="field-input">
-                <option value="" disabled>{{ 'employees.departmentPlaceholder' | translate }}</option>
+                <option value="" disabled>
+                  {{ 'employees.departmentPlaceholder' | translate }}
+                </option>
                 @for (department of departments(); track department.id) {
                   <option [value]="department.id">{{ department.name }}</option>
                 }
@@ -98,32 +140,62 @@
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="contract_date">{{ 'employees.contractDate' | translate }}</label>
-              <input id="contract_date" type="date" formControlName="contract_date" class="field-input" />
+              <label class="field-label mb-1.5 block" for="contract_date">{{
+                'employees.contractDate' | translate
+              }}</label>
+              <input
+                id="contract_date"
+                type="date"
+                formControlName="contract_date"
+                class="field-input"
+              />
               @if (fieldError('work.contract_date'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="base_salary">{{ 'employees.baseSalary' | translate }}</label>
-              <input id="base_salary" type="text" inputmode="decimal" formControlName="base_salary" dir="ltr" class="field-input" />
+              <label class="field-label mb-1.5 block" for="base_salary">{{
+                'employees.baseSalary' | translate
+              }}</label>
+              <input
+                id="base_salary"
+                type="text"
+                inputmode="decimal"
+                formControlName="base_salary"
+                dir="ltr"
+                class="field-input"
+              />
               @if (fieldError('work.base_salary'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="check_in_time">{{ 'employees.checkInTime' | translate }}</label>
-              <input id="check_in_time" type="time" formControlName="check_in_time" class="field-input" />
+              <label class="field-label mb-1.5 block" for="check_in_time">{{
+                'employees.checkInTime' | translate
+              }}</label>
+              <input
+                id="check_in_time"
+                type="time"
+                formControlName="check_in_time"
+                class="field-input"
+              />
               @if (fieldError('work.check_in_time'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
             </div>
 
             <div class="mb-5">
-              <label class="field-label mb-1.5 block" for="check_out_time">{{ 'employees.checkOutTime' | translate }}</label>
-              <input id="check_out_time" type="time" formControlName="check_out_time" class="field-input" />
+              <label class="field-label mb-1.5 block" for="check_out_time">{{
+                'employees.checkOutTime' | translate
+              }}</label>
+              <input
+                id="check_out_time"
+                type="time"
+                formControlName="check_out_time"
+                class="field-input"
+              />
               @if (fieldError('work.check_out_time'); as key) {
                 <p class="field-error">{{ key | translate }}</p>
               }
@@ -135,7 +207,7 @@
         </fieldset>
 
         <div class="mt-6 flex flex-wrap gap-3">
-          <button type="submit" [disabled]="form.invalid || saving()" class="btn-primary">
+          <button type="submit" [disabled]="saving()" class="btn-primary">
             {{ (saving() ? 'common.saving' : 'common.save') | translate }}
           </button>
           <a routerLink="/employees" class="btn-ghost">{{ 'common.cancel' | translate }}</a>

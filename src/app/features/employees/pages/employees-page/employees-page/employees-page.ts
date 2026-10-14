@@ -13,12 +13,13 @@ import {
   TranslatedMessage,
   msg,
 } from '../../../../../shared/utils/i18n-key.util';
+import { EmployeeCard } from '../../../components/employee-card/employee-card';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 12;
 
 @Component({
   selector: 'app-employees-page',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, EmployeeCard],
   templateUrl: './employees-page.html',
   styleUrl: './employees-page.css',
 })
@@ -33,6 +34,7 @@ export class EmployeesPage {
   readonly departments = signal<Department[]>([]);
   readonly loading = signal(true);
   readonly errorMessage = signal<TranslatedMessage | null>(null);
+  readonly isMobile = signal(window.innerWidth < 1024);
 
   readonly canView = signal(this.authService.hasPermission('employees', 'view'));
   readonly canEdit = signal(this.authService.hasPermission('employees', 'edit'));
