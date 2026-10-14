@@ -9,7 +9,7 @@ import {
 // there is something to actually check. Error keys map 1:1 to
 // VALIDATION_MESSAGES entries in the template.
 
-const PHONE_PATTERN = new RegExp(`^[0-9]{${PHONE_MIN_LENGTH},}$`);
+const PHONE_PATTERN = new RegExp(/^01[0125][0-9]{8}$/gm);
 const NATIONAL_ID_PATTERN = new RegExp(`^[0-9]{${NATIONAL_ID_LENGTH}}$`);
 const SALARY_PATTERN = /^\d+(\.\d{1,2})?$/;
 
@@ -28,7 +28,6 @@ function parseIsoDate(value: string): Date | null {
   return date;
 }
 
-// Full age in years — month/day aware, so 19y 364d still fails.
 function fullAge(dob: Date, today: Date): number {
   let age = today.getFullYear() - dob.getFullYear();
   const monthDiff = today.getMonth() - dob.getMonth();
@@ -64,15 +63,12 @@ export function nationalIdValidator(): ValidatorFn {
   };
 }
 
-// minDate is read lazily (plain function or signal) because the
-// founding date is fetched asynchronously after the form is built.
 export function contractDateValidator(minDate: () => string): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = String(control.value ?? '').trim();
     if (!value) return null;
     const min = minDate();
     if (!min || !parseIsoDate(value)) return null;
-    // ISO dates sort correctly as strings.
     return value >= min ? null : { contractDate: true };
   };
 }

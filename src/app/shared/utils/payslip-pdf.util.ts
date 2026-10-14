@@ -15,7 +15,7 @@ export function maskNationalId(nationalId: string | null | undefined): string {
   if (!nationalId) return '—';
   const id = String(nationalId);
   if (id.length <= 4) return id;
-  return '•'.repeat(id.length - 4) + id.slice(-4);
+  return '*'.repeat(id.length - 4) + id.slice(-4);
 }
 
 /** "September 2026" style label for a (month 1-12, year) period. */

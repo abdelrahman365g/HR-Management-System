@@ -58,9 +58,23 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string): Promise<{ error: string | null }> {
+  async login(identifier: string, password: string): Promise<{ error: string | null }> {
+    let email = identifier.trim();
+
     if (!email || !password) {
       return { error: 'Please enter a valid username and a valid password' };
+    }
+
+    if (!email.includes('@')) {
+      const { data, error } = await this.supabase.client.rpc('get_login_email', {
+        p_identifier: email,
+      });
+
+      if (error || !data) {
+        return { error: 'Please enter a valid username and a valid password' };
+      }
+
+      email = data;
     }
 
     const { data, error } = await this.supabase.client.auth.signInWithPassword({
@@ -80,24 +94,6 @@ export class AuthService {
 
     return { error: null };
   }
-  
-  async loginWithUsername(username: string, password: string): Promise<{ error: string | null }> {
-    if (!username || !password) return { error: 'Please enter a valid username and a valid password' };
-
-    const { data: user, error: userError } = await this.supabase.client
-      .from('app_users')
-      .select('id, email')
-      .eq('username', username)
-      .single();
-
-    if (userError || !user) {
-      return { error: 'Please enter a valid username and a valid password' };
-    }
-    
-    await this.login(user.email, password);
-
-    return { error: null };
-  }
 
   async logout(): Promise<void> {
     await this.supabase.client.auth.signOut();
@@ -112,5 +108,4 @@ export class AuthService {
     if (user.is_hr_admin) return true;
     return !!this.currentGroup()?.permissions?.[screen]?.[action];
   }
-  
 }

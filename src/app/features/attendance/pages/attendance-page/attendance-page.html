@@ -95,7 +95,7 @@
                   <th scope="col" class="w-12 hidden md:table-cell">
                     {{ 'attendance.indexHeader' | translate }}
                   </th>
-                  <th scope="col" class="hidden lg:w-44">
+                  <th scope="col" class="hidden lg:table-cell">
                     {{ 'attendance.department' | translate }}
                   </th>
                   <th scope="col">{{ 'attendance.employeeName' | translate }}</th>
@@ -125,10 +125,21 @@
                     </td>
                     <td class="text-muted">{{ recordDate(record.record_date) }}</td>
                     @if (isHrAdmin()) {
-                      <td class="whitespace-nowrap">
-                        <a [routerLink]="[record.id, 'edit']" class="btn-text">
+                      <td class="flex items-end gap-2">
+                        <a [routerLink]="[record.id, 'edit']" class="btn-text cursor-pointer">
                           {{ 'common.edit' | translate }}
                         </a>
+                        <button
+                          class="btn-text-danger cursor-pointer"
+                          (click)="onDelete(record.id)"
+                          [disabled]="deleting()"
+                        >
+                          {{
+                            deleting()
+                              ? ('common.deleting' | translate)
+                              : ('common.delete' | translate)
+                          }}
+                        </button>
                       </td>
                     }
                   </tr>

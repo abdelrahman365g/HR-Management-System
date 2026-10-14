@@ -1,6 +1,6 @@
 <div class="relative min-h-screen bg-canvas">
   <!-- Compact language + theme switchers, top inline-end corner -->
-  <div class="absolute end-4 top-4 z-20 flex items-center gap-2">
+  <div class="absolute inset-e-4 top-4 z-20 flex items-center gap-2">
     <!-- Theme toggle -->
     <div class="relative">
       <button
@@ -43,7 +43,9 @@
             aria-hidden="true"
           >
             <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+            />
           </svg>
         }
       </button>
@@ -157,8 +159,14 @@
   <!-- Split layout at lg: brand-gradient side + form side -->
   <div class="grid min-h-screen lg:grid-cols-2">
     <!-- Brand side (lg+): primary-700 → accent gradient, never near-black -->
-    <div class="hidden flex-col justify-between bg-hero bg-grid-faint p-12 lg:flex">
-      <div class="flex items-center gap-3">
+    <div
+      class="hidden flex-col justify-between bg-linear-to-br from-primary-600 to-accent p-12 lg:flex"
+    >
+      <div>
+        <img src="logo.png" alt="Logo" class="h-6 lg:h-10" />
+      </div>
+
+      <!-- <div class="flex items-end gap-3">
         <span
           class="grid size-10 place-items-center rounded-md bg-gradient-to-br from-primary-600 to-accent text-white"
           aria-hidden="true"
@@ -182,8 +190,10 @@
             <path d="M10 18h2" />
           </svg>
         </span>
-        <span class="font-display text-lg font-extrabold text-fg-inverted">HRMS</span>
-      </div>
+        <span class="font-display text-lg font-extrabold text-fg-inverted">{{
+          'auth.hrms' | translate
+        }}</span>
+      </div> -->
 
       <div>
         <h1 class="font-display text-3xl font-extrabold tracking-tight text-fg-inverted">
@@ -191,20 +201,70 @@
         </h1>
         <ul class="mt-8 space-y-4 text-sm text-primary-100">
           <li class="flex items-center gap-3">
-            <span class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-sky-300" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" /></svg>
+            <span
+              class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-sky-400"
+              aria-hidden="true"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+                />
+              </svg>
             </span>
             {{ 'auth.featureAttendance' | translate }}
           </li>
           <li class="flex items-center gap-3">
-            <span class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-accent" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+            <span
+              class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-purple-600"
+              aria-hidden="true"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
             </span>
             {{ 'auth.featureEmployees' | translate }}
           </li>
           <li class="flex items-center gap-3">
-            <span class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-success" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+            <span
+              class="grid size-8 shrink-0 place-items-center rounded-md bg-white/10 text-emerald-500"
+              aria-hidden="true"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
             </span>
             {{ 'auth.featurePayroll' | translate }}
           </li>
@@ -223,7 +283,17 @@
             class="grid size-10 place-items-center rounded-md bg-gradient-to-br from-primary-600 to-accent text-white"
             aria-hidden="true"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
               <path d="M6 12h12" />
             </svg>
