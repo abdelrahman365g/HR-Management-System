@@ -8,11 +8,6 @@ import {
 import { TranslatePipe } from '@ngx-translate/core';
 import { ConfirmService } from '../../../core/services/confirm';
 
-/**
- * Application-wide confirmation dialog, hosted once in app.html and
- * driven by ConfirmService. Built on the native <dialog> element for
- * the built-in focus trap, Esc handling and inert background.
- */
 @Component({
   selector: 'app-confirm-dialog',
   imports: [TranslatePipe],

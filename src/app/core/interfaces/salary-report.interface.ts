@@ -17,7 +17,6 @@ export interface SalaryReport {
   total_absence_amount?: number;
 }
 
-// One row of the get_salary_report RPC result (migration 0007).
 export interface SalaryReportRow {
   employee_id: string;
   employee_name: string;

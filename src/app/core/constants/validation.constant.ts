@@ -1,7 +1,3 @@
-// Mirrors the DB-level constraints in migration 0001, kept here so
-// Angular validators and error messages stay in sync with the schema.
-// Values are i18n keys (see src/assets/i18n/en.json); call sites
-// translate them with the translate pipe/service.
 export const COMPANY_FOUNDING_DATE = '2008-01-01';
 export const NATIONAL_ID_LENGTH = 14;
 export const MIN_PHONE_DIGITS = 11;
