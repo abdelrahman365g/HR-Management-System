@@ -56,7 +56,7 @@
     "hrms": "Human Resource Management System",
     "signInTitle": "Sign in to HRMS",
     "signInSubtitle": "Enter your credentials to access your workspace.",
-    "email": "Email",
+    "email": "Email Or Username",
     "password": "Password",
     "signIn": "Sign in",
     "signingIn": "Signing in…",
