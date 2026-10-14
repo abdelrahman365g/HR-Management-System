@@ -1,13 +1,15 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AttendanceRow, AttendanceSearchCriteria, AttendanceService } from '../../services/attendance-service';
+import {
+  AttendanceRow,
+  AttendanceSearchCriteria,
+  AttendanceService,
+} from '../../services/attendance-service';
 import { DepartmentsService } from '../../../departments/services/departments-service';
 import { AuthService } from '../../../../core/services/auth';
 import { Department } from '../../../../core/interfaces/employee.interface';
-import {
-  ATTENDANCE_MESSAGES,
-} from '../../../../core/constants/validation.constant';
+import { ATTENDANCE_MESSAGES } from '../../../../core/constants/validation.constant';
 import { dateRangeValidator } from '../../../../shared/validators/attendance.validators';
 import { TranslatedMessage, msg } from '../../../../shared/utils/i18n-key.util';
 import { LanguageService } from '../../../../core/services/language';
@@ -32,6 +34,7 @@ export class AttendancePage {
   readonly records = signal<AttendanceRow[]>([]);
   readonly departments = signal<Department[]>([]);
   readonly loading = signal(false);
+  readonly deleting = signal(false);
   readonly searched = signal(false);
   readonly errorMessage = signal<TranslatedMessage | null>(null);
   readonly page = signal(0);
@@ -89,8 +92,8 @@ export class AttendancePage {
 
     if (noCriteriaAtAll) {
       const now = new Date();
-      effectiveFrom = toIsoDate(new Date(now.getFullYear(), now.getMonth(), now.getDate()-1));
-      effectiveTo = toIsoDate(new Date(now.getFullYear(), now.getMonth() , now.getDate()));
+      effectiveFrom = toIsoDate(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
+      effectiveTo = toIsoDate(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
       this.form.patchValue({ dateFrom: effectiveFrom, dateTo: effectiveTo }, { emitEvent: false });
     }
     this.appliedDefaultRange.set(noCriteriaAtAll);
@@ -135,6 +138,23 @@ export class AttendancePage {
           this.loading.set(false);
         },
       });
+  }
+
+  onDelete(recordId : string) {
+    if(!recordId) return;
+this.deleting.set(true);
+
+    this.attendanceService.deleteRecord(recordId).subscribe({
+      next: () => {
+        this.records.update(records => records.filter(r => r.id !== recordId));
+        this.total.update(total => total - 1);
+        this.deleting.set(false);
+      },
+      error: (error) => {
+        this.deleting.set(false);
+        this.errorMessage.set(error.message || msg('attendance.deleteFailed'));
+      }
+    });
   }
 }
 
