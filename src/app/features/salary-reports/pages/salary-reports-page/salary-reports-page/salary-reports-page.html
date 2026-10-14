@@ -1,5 +1,5 @@
-<div class="page px-4 py-6 lg:px-8">
-  <div class="mb-4 flex items-center justify-between gap-3">
+<div class="page md:px-4 py-6 lg:px-8">
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
       {{ 'salary.title' | translate }}
     </h1>
@@ -28,7 +28,7 @@
         {{ info.key | translate: info.params }}
       </div>
     }
-
+    <!-- 
     <div class="mb-4 inline-flex overflow-hidden rounded-md border border-line">
       <button
         type="button"
@@ -52,7 +52,7 @@
       >
         {{ 'salary.reportTypeYearly' | translate }}
       </button>
-    </div>
+    </div> -->
 
     <form [formGroup]="form" (ngSubmit)="onSearch()" class="card mb-5">
       <div class="flex flex-wrap items-start gap-4">
@@ -127,95 +127,98 @@
               {{ (printing() ? 'salary.preparing' : 'salary.printReport') | translate }}
             </button>
           </div>
-
-          <div class="card overflow-hidden p-0">
-            <div class="overflow-x-auto">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th scope="col">{{ 'salary.employeeHeader' | translate }}</th>
-                    <th scope="col">{{ 'salary.department' | translate }}</th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.baseSalaryHeader' | translate: { currency: currencyCode } }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.attendanceDaysHeader' | translate }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.absenceDaysHeader' | translate }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.notEmployedColumn' | translate }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.overtimeHoursHeader' | translate }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.lateEarlyHoursHeader' | translate }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.totalOvertimeHeader' | translate: { currency: currencyCode } }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{
-                        'salary.lateEarlyDeductionHeader' | translate: { currency: currencyCode }
-                      }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.absenceDeductionHeader' | translate: { currency: currencyCode } }}
-                    </th>
-                    <th scope="col" class="text-end">
-                      {{ 'salary.netSalaryHeader' | translate: { currency: currencyCode } }}
-                    </th>
-                    <th scope="col">{{ 'salary.sourceHeader' | translate }}</th>
-                    <th scope="col">{{ 'common.actions' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (row of rows(); track row.employee_id) {
+          @if (!isMobile()) {
+            <div class="card overflow-hidden p-0">
+              <div class="overflow-x-auto">
+                <table class="data-table">
+                  <thead>
                     <tr>
-                      <td class="font-semibold text-fg">{{ row.employee_name }}</td>
-                      <td class="text-muted">{{ row.department_name }}</td>
-                      <td class="text-end text-muted tabular-nums">
-                        <span dir="ltr">{{ money(row.base_salary) }}</span>
-                      </td>
-                      <td class="text-end text-muted tabular-nums">{{ row.attendance_days }}</td>
-                      <td class="text-end text-muted tabular-nums">{{ row.absence_days }}</td>
-                      <td class="text-end text-muted tabular-nums">{{ row.not_employed_days }}</td>
-                      <td class="text-end text-muted tabular-nums">
-                        <span dir="ltr">{{ hours(row.overtime_hours) }}</span>
-                      </td>
-                      <td class="text-end text-muted tabular-nums">
-                        <span dir="ltr">{{ hours(row.deduction_hours) }}</span>
-                      </td>
-                      <td class="text-end text-muted tabular-nums">
-                        <span dir="ltr">{{ money(row.total_overtime_amount) }}</span>
-                      </td>
-                      <td class="text-end text-muted tabular-nums">
-                        <span dir="ltr">{{ money(row.total_deduction_amount) }}</span>
-                      </td>
-                      <td class="text-end text-muted tabular-nums">
-                        <span dir="ltr">{{ money(row.total_absence_amount) }}</span>
-                      </td>
-                      <td class="text-end font-semibold text-fg tabular-nums">
-                        <span dir="ltr">{{ money(row.net_salary) }}</span>
-                      </td>
-                      <td>
-                        <span [class]="isSourceSaved(row.source) ? 'chip-present' : 'chip-late'">
-                          {{ sourceLabelKey(row.source) | translate }}
-                        </span>
-                      </td>
-                      <td class="whitespace-nowrap">
-                        <button type="button" (click)="onPrint(row)" class="btn-text">
-                          {{ 'common.print' | translate }}
-                        </button>
-                      </td>
+                      <th scope="col">{{ 'salary.employeeHeader' | translate }}</th>
+                      <th scope="col">{{ 'salary.department' | translate }}</th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.baseSalaryHeader' | translate: { currency: currencyCode } }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.attendanceDaysHeader' | translate }}
+                      </th>
+
+                      <th scope="col" class="text-end">
+                        {{ 'salary.totalOvertimeHeader' | translate: { currency: currencyCode } }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{
+                          'salary.lateEarlyDeductionHeader' | translate: { currency: currencyCode }
+                        }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{
+                          'salary.absenceDeductionHeader' | translate: { currency: currencyCode }
+                        }}
+                      </th>
+                      <th scope="col" class="text-end">
+                        {{ 'salary.netSalaryHeader' | translate: { currency: currencyCode } }}
+                      </th>
+                      <th scope="col">{{ 'common.actions' | translate }}</th>
                     </tr>
-                  }
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    @for (row of rows(); track row.employee_id) {
+                      <tr>
+                        <td class="font-semibold text-fg">{{ row.employee_name }}</td>
+                        <td class="text-muted">{{ row.department_name }}</td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ money(row.base_salary) }}</span>
+                        </td>
+                        <td class="text-end text-muted tabular-nums">{{ row.attendance_days }}</td>
+
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ money(row.total_overtime_amount) }}</span>
+                        </td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ money(row.total_deduction_amount) }}</span>
+                        </td>
+                        <td class="text-end text-muted tabular-nums">
+                          <span dir="ltr">{{ money(row.total_absence_amount) }}</span>
+                        </td>
+                        <td class="text-end font-semibold text-fg tabular-nums">
+                          <span dir="ltr">{{ money(row.net_salary) }}</span>
+                        </td>
+
+                        <td class="flex gap-2 items-center justify-end">
+                          <button
+                            type="button"
+                            (click)="onView(row)"
+                            class="btn-text cursor-pointer"
+                          >
+                            {{ 'common.view' | translate }}
+                          </button>
+                          <button
+                            type="button"
+                            (click)="onPrint(row)"
+                            class="btn-text cursor-pointer"
+                          >
+                            {{ 'common.print' | translate }}
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          } @else {
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              @for (row of rows(); track row.employee_id) {
+                <app-salary-report-card
+                  [row]="row"
+                  [month]="this.form.get('month')?.value"
+                  [year]="this.form.get('year')?.value"
+                  [currencyCode]="currencyCode"
+                  (print)="onPrint($event)"
+                ></app-salary-report-card>
+              }
+            </div>
+          }
 
           <div class="mt-4 flex items-center gap-3 text-sm text-muted">
             <button
@@ -243,7 +246,8 @@
           <p class="mt-4 text-xs text-muted">{{ 'salary.tableNote' | translate }}</p>
         }
       }
-    } @else {
+    }
+    <!-- @else {
       @if (!searched()) {
         <p class="text-sm text-muted">{{ 'salary.yearlyInitialHint' | translate }}</p>
       } @else if (!yearlyReport()) {
@@ -384,7 +388,6 @@
                         </td>
                       </tr>
                     }
-                    <!-- Bold totals row -->
                     <tr class="bg-sunken font-bold text-fg">
                       <td class="border-t-2 border-line-strong px-5 py-3.5">
                         {{ 'salary.totalsRow' | translate }}
@@ -430,6 +433,6 @@
           }
         }
       }
-    }
+    } -->
   }
 </div>

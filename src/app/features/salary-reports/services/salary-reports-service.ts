@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { from, map, Observable, switchMap } from 'rxjs';
+import { from, map, Observable } from 'rxjs';
 import { Supabase } from '../../../core/services/supabase';
 import {
-  SalaryReportCriteria,
   SalaryReportResult,
   YearlySalaryReport,
 } from '../../../core/interfaces/salary-report.interface';
