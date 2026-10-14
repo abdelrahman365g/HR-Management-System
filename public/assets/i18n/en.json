@@ -53,6 +53,7 @@
     "hrAdmin": "HR Admin"
   },
   "auth": {
+    "hrms": "Human Resource Management System",
     "signInTitle": "Sign in to HRMS",
     "signInSubtitle": "Enter your credentials to access your workspace.",
     "email": "Email",
