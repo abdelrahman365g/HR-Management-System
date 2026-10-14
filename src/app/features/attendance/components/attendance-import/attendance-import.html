@@ -1,6 +1,6 @@
-<div class="page-narrow px-4 py-6 lg:px-8">
+<div class="page-narrow md:px-4 py-6 lg:px-8">
   <div>
-    <div class="mb-4 flex items-center justify-between gap-3">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
         {{ 'attendance.import.title' | translate }}
       </h1>
@@ -28,10 +28,7 @@
         {{ 'attendance.import.downloadTemplate' | translate }}
       </button>
 
-      <label
-        class="btn-primary cursor-pointer"
-        [class.opacity-50]="parsing() || !canEdit()"
-      >
+      <label class="btn-primary cursor-pointer" [class.opacity-50]="parsing() || !canEdit()">
         {{ (parsing() ? 'attendance.import.parsing' : 'attendance.import.chooseFile') | translate }}
         <input type="file" accept=".xlsx" class="hidden" (change)="onFileSelected($event)" />
       </label>
@@ -46,7 +43,10 @@
     @if (previewRows().length > 0) {
       <div class="mb-4">
         <h2 class="field-label mb-2">
-          {{ 'attendance.import.previewTitle' | translate: { shown: previewRows().length, total: totalRows() } }}
+          {{
+            'attendance.import.previewTitle'
+              | translate: { shown: previewRows().length, total: totalRows() }
+          }}
         </h2>
         <div class="card overflow-hidden p-0">
           <div class="overflow-x-auto">
@@ -54,7 +54,9 @@
               <thead>
                 <tr>
                   <th scope="col" class="w-16">{{ 'attendance.import.rowHeader' | translate }}</th>
-                  <th scope="col" class="w-44">{{ 'attendance.import.nationalIdHeader' | translate }}</th>
+                  <th scope="col" class="w-44">
+                    {{ 'attendance.import.nationalIdHeader' | translate }}
+                  </th>
                   <th scope="col" class="w-36">{{ 'common.date' | translate }}</th>
                   <th scope="col" class="w-28">{{ 'attendance.checkInHeader' | translate }}</th>
                   <th scope="col" class="w-28">{{ 'attendance.checkOutHeader' | translate }}</th>
@@ -64,10 +66,18 @@
                 @for (row of previewRows(); track row.row) {
                   <tr>
                     <td class="text-muted">{{ row.row }}</td>
-                    <td class="text-fg"><span dir="ltr">{{ row.national_id }}</span></td>
-                    <td class="text-muted"><span dir="ltr">{{ row.record_date }}</span></td>
-                    <td class="text-muted tabular-nums"><span dir="ltr">{{ row.check_in ?? '—' }}</span></td>
-                    <td class="text-muted tabular-nums"><span dir="ltr">{{ row.check_out ?? '—' }}</span></td>
+                    <td class="text-fg">
+                      <span dir="ltr">{{ row.national_id }}</span>
+                    </td>
+                    <td class="text-muted">
+                      <span dir="ltr">{{ row.record_date }}</span>
+                    </td>
+                    <td class="text-muted tabular-nums">
+                      <span dir="ltr">{{ row.check_in ?? '—' }}</span>
+                    </td>
+                    <td class="text-muted tabular-nums">
+                      <span dir="ltr">{{ row.check_out ?? '—' }}</span>
+                    </td>
                   </tr>
                 }
               </tbody>
@@ -77,13 +87,11 @@
       </div>
 
       @if (canEdit()) {
-        <button
-          type="button"
-          (click)="onImport()"
-          [disabled]="importing()"
-          class="btn-primary"
-        >
-          {{ (importing() ? 'attendance.import.importing' : 'attendance.import.importButton') | translate }}
+        <button type="button" (click)="onImport()" [disabled]="importing()" class="btn-primary">
+          {{
+            (importing() ? 'attendance.import.importing' : 'attendance.import.importButton')
+              | translate
+          }}
         </button>
       }
     }
@@ -103,7 +111,9 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th scope="col" class="w-16">{{ 'attendance.import.rowHeader' | translate }}</th>
+                    <th scope="col" class="w-16">
+                      {{ 'attendance.import.rowHeader' | translate }}
+                    </th>
                     <th scope="col">{{ 'attendance.import.reasonHeader' | translate }}</th>
                   </tr>
                 </thead>
@@ -118,11 +128,7 @@
               </table>
             </div>
           </div>
-          <button
-            type="button"
-            (click)="onDownloadSkipped()"
-            class="btn-ghost mt-3"
-          >
+          <button type="button" (click)="onDownloadSkipped()" class="btn-ghost mt-3">
             {{ 'attendance.import.downloadSkipped' | translate }}
           </button>
         }

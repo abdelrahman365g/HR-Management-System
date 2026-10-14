@@ -1,6 +1,6 @@
-<div class="page-narrow px-4 py-6 lg:px-8">
+<div class="page-narrow md:px-4 py-6 lg:px-8">
   <div class="card">
-    <div class="mb-4 flex items-center justify-between gap-3">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
       <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
         {{ (isEditMode() ? 'attendance.editTitle' : 'attendance.addTitle') | translate }}
       </h1>
@@ -21,7 +21,9 @@
 
         @if (isEditMode()) {
           <div class="banner-muted mb-5">
-            {{ 'attendance.employeeLine' | translate: { name: employeeName(), date: recordDate() } }}
+            {{
+              'attendance.employeeLine' | translate: { name: employeeName(), date: recordDate() }
+            }}
           </div>
         }
 
@@ -31,7 +33,9 @@
 
         <div class="grid gap-x-6 md:grid-cols-2">
           <div class="mb-5">
-            <label class="field-label mb-1.5 block" for="record_date">{{ 'common.date' | translate }}</label>
+            <label class="field-label mb-1.5 block" for="record_date">{{
+              'common.date' | translate
+            }}</label>
             <input id="record_date" type="date" formControlName="record_date" class="field-input" />
             @if (fieldError('record_date'); as key) {
               <p class="field-error">{{ key | translate }}</p>
@@ -42,14 +46,24 @@
             <label class="field-label mb-1.5 block" for="check_in_actual">
               {{ 'attendance.checkInHeader' | translate }}
             </label>
-            <input id="check_in_actual" type="time" formControlName="check_in_actual" class="field-input" />
+            <input
+              id="check_in_actual"
+              type="time"
+              formControlName="check_in_actual"
+              class="field-input"
+            />
           </div>
 
           <div class="mb-5">
             <label class="field-label mb-1.5 block" for="check_out_actual">
               {{ 'attendance.checkOutHeader' | translate }}
             </label>
-            <input id="check_out_actual" type="time" formControlName="check_out_actual" class="field-input" />
+            <input
+              id="check_out_actual"
+              type="time"
+              formControlName="check_out_actual"
+              class="field-input"
+            />
             @if (groupError('timeRange'); as key) {
               <p class="field-error">{{ key | translate }}</p>
             }

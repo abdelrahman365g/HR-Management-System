@@ -1,11 +1,17 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
-import { AttendanceService, ClockAction, ClockEmployee } from '../../../services/attendance-service';
+import {
+  AttendanceService,
+  ClockAction,
+  ClockEmployee,
+} from '../../../services/attendance-service';
 import { AuthService } from '../../../../../core/services/auth';
 import { TranslatedMessage, msg } from '../../../../../shared/utils/i18n-key.util';
+import { Department } from '../../../../../core/interfaces/employee.interface';
+import { DepartmentsService } from '../../../../departments/services/departments-service';
 
 interface DepartmentGroup {
   name: string;
@@ -14,27 +20,28 @@ interface DepartmentGroup {
 
 @Component({
   selector: 'app-attendance-clock-page',
-  imports: [FormsModule, RouterLink, TranslatePipe],
+  imports: [FormsModule, RouterLink, TranslatePipe, ReactiveFormsModule],
   templateUrl: './attendance-clock-page.html',
 })
 export class AttendanceClockPage {
+  private readonly departmentsService = inject(DepartmentsService);
   private readonly attendanceService = inject(AttendanceService);
   private readonly authService = inject(AuthService);
 
   readonly employees = signal<ClockEmployee[]>([]);
+  readonly departments = signal<Department[]>([]);
   readonly loading = signal(true);
   readonly errorMessage = signal<TranslatedMessage | null>(null);
   readonly busyEmployeeId = signal<string | null>(null);
+  readonly isMobile = signal(window.innerWidth < 768);
 
   readonly canView = signal(this.authService.hasPermission('attendance', 'view'));
   readonly canEdit = signal(this.authService.hasPermission('attendance', 'edit'));
 
-  // Plain string bound via ngModel; the `groups` computed below re-filters
-  // instantly on every keystroke — no search button, no server round trip.
-  departmentFilter = '';
+  departmentFilter = signal<string>('');
 
   readonly groups = computed<DepartmentGroup[]>(() => {
-    const filter = this.departmentFilter.trim().toLowerCase();
+    const filter = this.departmentFilter().trim().toLowerCase();
     const filtered = filter
       ? this.employees().filter((e) => e.department_name.toLowerCase().includes(filter))
       : this.employees();
@@ -46,9 +53,7 @@ export class AttendanceClockPage {
       byDepartment.set(employee.department_name, list);
     }
 
-    return Array.from(byDepartment.entries())
-      .map(([name, employees]) => ({ name, employees }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return Array.from(byDepartment.entries()).map(([name, employees]) => ({ name, employees }));
   });
 
   constructor() {
@@ -56,6 +61,12 @@ export class AttendanceClockPage {
       this.loading.set(false);
       return;
     }
+    this.departmentsService.listDepartments().subscribe({
+      next: (departments) => this.departments.set(departments),
+      error: () => {
+        this.errorMessage.set(msg('employees.loadDepartmentsFailed'));
+      },
+    });
     this.loadEmployees();
   }
 
@@ -76,7 +87,7 @@ export class AttendanceClockPage {
   }
 
   onClock(employee: ClockEmployee, action: ClockAction): void {
-    if (this.busyEmployeeId()) return; // one in-flight click at a time
+    if (this.busyEmployeeId()) return;
 
     this.busyEmployeeId.set(employee.id);
     this.errorMessage.set(null);
@@ -87,7 +98,11 @@ export class AttendanceClockPage {
         this.employees.update((list) =>
           list.map((e) =>
             e.id === employee.id
-              ? { ...e, check_in_actual: record.check_in_actual, check_out_actual: record.check_out_actual }
+              ? {
+                  ...e,
+                  check_in_actual: record.check_in_actual,
+                  check_out_actual: record.check_out_actual,
+                }
               : e,
           ),
         );
@@ -99,7 +114,6 @@ export class AttendanceClockPage {
     });
   }
 
-  /** Row status for the status rail: checked-out > checked-in > pending. */
   statusOf(employee: ClockEmployee): 'present' | 'late' | 'none' {
     if (employee.check_in_actual && employee.check_out_actual) return 'present';
     if (employee.check_in_actual) return 'late';
@@ -121,7 +135,11 @@ export class AttendanceClockPage {
       case 'INVALID_TIME_RANGE':
         return msg('attendance.clock.invalidTimeRange');
       default:
-        return msg(action === 'check_in' ? 'attendance.clock.checkInFailed' : 'attendance.clock.checkOutFailed');
+        return msg(
+          action === 'check_in'
+            ? 'attendance.clock.checkInFailed'
+            : 'attendance.clock.checkOutFailed',
+        );
     }
   }
 }

@@ -1,4 +1,4 @@
-<div class="page px-4 py-6 lg:px-8">
+<div class="page md:px-4 py-6 lg:px-8">
   <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
     <h1 class="font-display text-2xl font-extrabold tracking-tight text-fg">
       {{ 'attendance.clock.title' | translate }}
@@ -15,17 +15,21 @@
       </div>
     }
 
-    <div class="mb-5">
-      <label class="field-label mb-1.5 block" for="departmentFilter">
-        {{ 'attendance.clock.filterByDepartment' | translate }}
+    <div class="my-3">
+      <label class="field-label mb-1.5 block" for="department_id">
+        {{ 'attendance.department' | translate }}
       </label>
-      <input
-        id="departmentFilter"
-        type="text"
-        [(ngModel)]="departmentFilter"
-        [attr.placeholder]="'attendance.clock.filterPlaceholder' | translate"
-        class="field-input h-11 w-72"
-      />
+      <select
+        #departmentSelect
+        id="department_id"
+        class="field-input w-auto px-4"
+        (change)="departmentFilter.set(departmentSelect.value)"
+      >
+        <option value="">{{ 'attendance.allDepartments' | translate }}</option>
+        @for (department of departments(); track department.id) {
+          <option [value]="department.name">{{ department.name }}</option>
+        }
+      </select>
     </div>
 
     @if (loading()) {
@@ -47,7 +51,7 @@
                       <th scope="col" class="w-24">
                         {{ 'attendance.checkOutHeader' | translate }}
                       </th>
-                      @if (canEdit()) {
+                      @if (canEdit() && !isMobile()) {
                         <th scope="col" class="w-56">{{ 'common.actions' | translate }}</th>
                       }
                     </tr>
@@ -66,12 +70,66 @@
                           {{ employee.full_name }}
                         </td>
                         <td class="text-muted tabular-nums">
-                          <span dir="ltr">{{ employee.check_in_actual?.slice(0, 5) ?? '—' }}</span>
+                          @if (isMobile() && employee.check_in_actual) {
+                            <span dir="ltr">{{ employee.check_in_actual.slice(0, 5) }}</span>
+                          } @else if (isMobile() && !employee.check_in_actual) {
+                            <button
+                              type="button"
+                              [disabled]="
+                                !!employee.check_in_actual || busyEmployeeId() === employee.id
+                              "
+                              (click)="onClock(employee, 'check_in')"
+                              class="me-2 inline-flex h-9 items-center rounded-md px-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+                              [class.bg-success]="!employee.check_in_actual"
+                              [class.text-white]="!employee.check_in_actual"
+                              [class.hover:opacity-90]="!employee.check_in_actual"
+                              [class.bg-sunken]="!!employee.check_in_actual"
+                              [class.text-muted]="!!employee.check_in_actual"
+                            >
+                              {{
+                                (employee.check_in_actual
+                                  ? 'attendance.clock.checkedIn'
+                                  : 'attendance.clock.checkIn'
+                                ) | translate
+                              }}
+                            </button>
+                          } @else {
+                            <span dir="ltr">{{
+                              employee.check_in_actual?.slice(0, 5) ?? '—'
+                            }}</span>
+                          }
                         </td>
                         <td class="text-muted tabular-nums">
-                          <span dir="ltr">{{ employee.check_out_actual?.slice(0, 5) ?? '—' }}</span>
+                          @if (isMobile() && employee.check_out_actual) {
+                            <span dir="ltr">{{ employee.check_out_actual.slice(0, 5) }}</span>
+                          } @else if (isMobile() && !employee.check_out_actual) {
+                            <button
+                              type="button"
+                              [disabled]="
+                                !!employee.check_out_actual || busyEmployeeId() === employee.id
+                              "
+                              (click)="onClock(employee, 'check_out')"
+                              class="inline-flex h-9 items-center rounded-md px-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+                              [class.bg-primary-600]="!employee.check_out_actual"
+                              [class.text-white]="!employee.check_out_actual"
+                              [class.hover:opacity-90]="!employee.check_out_actual"
+                              [class.bg-sunken]="!!employee.check_out_actual"
+                              [class.text-muted]="!!employee.check_out_actual"
+                            >
+                              {{
+                                (employee.check_out_actual
+                                  ? 'attendance.clock.checkedOut'
+                                  : 'attendance.clock.checkOut'
+                                ) | translate
+                              }}
+                            </button>
+                          } @else {
+                            <span dir="ltr">{{
+                              employee.check_out_actual?.slice(0, 5) ?? '—'
+                            }}</span>
+                          }
                         </td>
-                        @if (canEdit()) {
+                        @if (canEdit() && !isMobile()) {
                           <td class="whitespace-nowrap">
                             <button
                               type="button"
