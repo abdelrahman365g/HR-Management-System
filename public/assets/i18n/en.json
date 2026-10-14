@@ -4,6 +4,7 @@
     "save": "Save",
     "saving": "Saving…",
     "cancel": "Cancel",
+    "view": "View",
     "edit": "Edit",
     "delete": "Delete",
     "search": "Search",
@@ -273,9 +274,9 @@
   },
   "validation": {
     "required": "This field is required.",
-    "phone": "Please enter a valid phone number.",
+    "phone": "Please enter a valid egyptian phone number.",
     "age": "Employee must be at least 20 years old.",
-    "nationalId": "National ID must be exactly 14 digits.",
+    "nationalId": "Please enter a valid egyptian national ID.",
     "nationalIdDuplicate": "An employee with this national ID already exists.",
     "contractDate": "Contract date cannot be before the company founding date.",
     "salary": "Salary must be a positive number with up to 2 decimals.",
@@ -469,6 +470,7 @@
     "totalAttendance": "Total attendance days",
     "totalAbsenceDays": "Total absence days",
     "totalsRow": "Totals",
+    "deductionSum": "Total deduction",
     "yearlyLiveNotice": "The current month is live and not final yet.",
     "snapshotCoverage": "{n} of {m} months from saved snapshots.",
     "yearlyEmpty": "No salary months found for this employee in the selected year.",
@@ -480,5 +482,57 @@
     "title": "Page not found",
     "message": "The page you're looking for doesn't exist or you don't have access to it.",
     "backToDashboard": "Back to dashboard"
+  },
+  "detailsDialog": {
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "noRows": "Nothing to show."
+  },
+  "auditLog": {
+    "details": {
+      "title": "Change details",
+      "changes": "What changed",
+      "view": "View"
+    }
+  },
+  "salaryDetails": {
+    "title": "{{name}}",
+    "view": "View",
+    "sections": {
+      "employee": "Employee",
+      "attendance": "Attendance",
+      "hours": "Hours",
+      "amounts": "Amounts",
+      "months": "Month by month"
+    },
+    "fields": {
+      "employeeName": "Employee",
+      "nationalId": "National ID",
+      "department": "Department",
+      "source": "Source",
+      "generatedAt": "Saved on",
+      "attendanceDays": "Attendance days",
+      "absenceDays": "Absence days",
+      "notEmployedDays": "Days before joining",
+      "overtimeHours": "Overtime hours",
+      "deductionHours": "Deduction hours",
+      "baseSalary": "Base salary",
+      "dailyRate": "Daily rate",
+      "overtimeAmount": "Total overtime",
+      "deductionAmount": "Total deduction",
+      "absenceAmount": "Absence deduction",
+      "netSalary": "Net salary",
+      "month": "Month",
+      "total": "Total"
+    },
+    "source": {
+      "live": "Live",
+      "snapshot": "Saved"
+    },
+    "unit": {
+      "hours": "h",
+      "days": "d"
+    }
   }
 }
