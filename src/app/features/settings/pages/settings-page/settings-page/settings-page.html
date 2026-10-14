@@ -33,6 +33,7 @@
                   formControlName="overtime_unit_hours"
                   dir="ltr"
                   class="field-input"
+                  [class.cursor-not-allowed]="!canEdit()"
                 />
                 @if (fieldError('overtime_unit_hours'); as key) {
                   <p class="field-error">{{ key | translate }}</p>
@@ -50,6 +51,7 @@
                   formControlName="overtime_rate_per_unit"
                   dir="ltr"
                   class="field-input"
+                  [class.cursor-not-allowed]="!canEdit()"
                 />
                 @if (fieldError('overtime_rate_per_unit'); as key) {
                   <p class="field-error">{{ key | translate }}</p>
@@ -67,6 +69,7 @@
                   formControlName="deduction_unit_hours"
                   dir="ltr"
                   class="field-input"
+                  [class.cursor-not-allowed]="!canEdit()"
                 />
                 @if (fieldError('deduction_unit_hours'); as key) {
                   <p class="field-error">{{ key | translate }}</p>
@@ -84,6 +87,7 @@
                   formControlName="deduction_rate_per_unit"
                   dir="ltr"
                   class="field-input"
+                  [class.cursor-not-allowed]="!canEdit()"
                 />
                 @if (fieldError('deduction_rate_per_unit'); as key) {
                   <p class="field-error">{{ key | translate }}</p>
