@@ -53,7 +53,7 @@
       @if (themeMenuOpen()) {
         <div
           role="menu"
-          class="menu-panel absolute end-0 top-full mt-2 w-40 animate-scale-in"
+          class="menu-panel absolute inset-e-0 top-full mt-2 w-40 animate-scale-in"
           (keydown.escape)="closeMenu()"
         >
           @for (option of themeOptions; track option.value) {
@@ -120,7 +120,7 @@
       @if (menuOpen()) {
         <div
           role="menu"
-          class="menu-panel absolute end-0 top-full mt-2 w-40 animate-scale-in"
+          class="menu-panel absolute inset-e-0 top-full mt-2 w-40 animate-scale-in"
           (keydown.escape)="closeMenu()"
         >
           @for (language of languages; track language.code) {
@@ -280,7 +280,7 @@
         <!-- Logo above the form below lg -->
         <div class="mb-8 flex items-center justify-center gap-3 lg:hidden">
           <span
-            class="grid size-10 place-items-center rounded-md bg-gradient-to-br from-primary-600 to-accent text-white"
+            class="grid size-10 place-items-center rounded-md bg-linear-to-br from-primary-600 to-accent text-white"
             aria-hidden="true"
           >
             <svg
